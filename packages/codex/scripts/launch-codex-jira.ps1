@@ -10,10 +10,20 @@ $ErrorActionPreference = 'Stop'
 # Load System.Windows.Forms before any function whose parameter type references it.
 Add-Type -AssemblyName System.Windows.Forms
 $projectRoot = Split-Path -Parent $PSScriptRoot
+$applicationRoot = Split-Path -Parent (Split-Path -Parent $projectRoot)
 $runtimeDirectory = Join-Path $projectRoot '.runtime'
 $userDataRoot = Join-Path $env:LOCALAPPDATA 'jira-workbench'
 $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+$processHelperPath = Join-Path $PSScriptRoot 'codex-processes.ps1'
+if (-not (Test-Path -LiteralPath $processHelperPath)) {
+  throw "缺少 Codex 进程识别脚本：$processHelperPath"
+}
+. $processHelperPath
+$codexPackage = Get-CodexStorePackage
+$codexPackageRoot = if ($codexPackage) { [string]$codexPackage.InstallLocation } else { '' }
 $installMetadataPath = @(
+  (Join-Path $applicationRoot 'install-state.json'),
+  (Join-Path $applicationRoot 'install-metadata.json'),
   (Join-Path $projectRoot 'install-state.json'),
   (Join-Path $projectRoot 'install-metadata.json')
 ) | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
@@ -22,7 +32,10 @@ if ($installMetadataPath) {
     $installMetadata = Get-Content -Raw -LiteralPath $installMetadataPath | ConvertFrom-Json
     $configuredAppServerCommand = [string]$installMetadata.codexAppServerCommand
     if ($configuredAppServerCommand -and (Test-Path -LiteralPath $configuredAppServerCommand)) {
-      $env:JIRA_WORKBENCH_APP_SERVER_COMMAND = $configuredAppServerCommand
+      # Keep the installer-selected CLI as a fallback. The Node adapter first
+      # selects the CLI bundled with the current Codex Desktop update so its
+      # App Server protocol remains version-aligned.
+      $env:JIRA_WORKBENCH_FALLBACK_APP_SERVER_COMMAND = $configuredAppServerCommand
     }
   } catch {
     Write-Warning "无法读取 App Server 安装信息，将使用自动发现：$($_.Exception.Message)"
@@ -61,13 +74,6 @@ function Test-CdpEndpoint {
   }
 }
 
-function Get-CodexMainProcesses {
-  @(Get-CimInstance Win32_Process -Filter "Name = 'ChatGPT.exe'" -ErrorAction SilentlyContinue | Where-Object {
-    (-not $_.CommandLine -or $_.CommandLine -notmatch '(?:^|\s)--type=') -and
-    (-not (Get-Process -Id $_.ProcessId -ErrorAction SilentlyContinue).HasExited)
-  })
-}
-
 function Show-Message {
   param(
     [string]$Text,
@@ -81,7 +87,10 @@ function Show-Message {
 }
 
 function Stop-CodexGracefully {
-  param([object[]]$Processes)
+  param(
+    [object[]]$Processes,
+    [string]$PackageInstallLocation
+  )
 
   foreach ($processInfo in $Processes) {
     $process = Get-Process -Id $processInfo.ProcessId -ErrorAction SilentlyContinue
@@ -90,9 +99,25 @@ function Stop-CodexGracefully {
     }
   }
 
-  for ($attempt = 0; $attempt -lt 30; $attempt++) {
+  for ($attempt = 0; $attempt -lt 20; $attempt++) {
     Start-Sleep -Milliseconds 500
-    if (@(Get-CodexMainProcesses).Count -eq 0) { return $true }
+    if (@(Get-CodexMainProcesses -PackageInstallLocation $PackageInstallLocation).Count -eq 0) {
+      return $true
+    }
+  }
+
+  # After the user approved the restart and the graceful deadline elapsed,
+  # only terminate verified processes belonging to the current Store package.
+  # Inaccessible leftovers from older package versions are deliberately ignored.
+  $remaining = @(Get-CodexMainProcesses -PackageInstallLocation $PackageInstallLocation)
+  foreach ($processInfo in @($remaining | Where-Object { $_.PackageOwned })) {
+    Stop-Process -Id ([int]$processInfo.ProcessId) -Force -ErrorAction SilentlyContinue
+  }
+  for ($attempt = 0; $attempt -lt 10; $attempt++) {
+    Start-Sleep -Milliseconds 500
+    if (@(Get-CodexMainProcesses -PackageInstallLocation $PackageInstallLocation).Count -eq 0) {
+      return $true
+    }
   }
   return $false
 }
@@ -115,7 +140,7 @@ public static class JiraWorkbenchWindowActivator {
 
   $debugArgumentPattern = "(?:^|\s)--remote-debugging-port(?:=|\s+)$CdpPort(?:\s|$)"
   for ($attempt = 0; $attempt -lt 20; $attempt++) {
-    $processInfo = @(Get-CodexMainProcesses)
+    $processInfo = @(Get-CodexMainProcesses -PackageInstallLocation $codexPackageRoot)
     $preferred = @($processInfo | Where-Object { $_.CommandLine -match $debugArgumentPattern })
     $candidates = if ($preferred.Count -gt 0) { $preferred } else { $processInfo }
     foreach ($candidate in $candidates) {
@@ -161,10 +186,12 @@ function Complete-PendingUpdateAfterRestart {
 }
 
 try {
-  $initialCodexProcessIds = @(Get-CodexMainProcesses | ForEach-Object { [int]$_.ProcessId })
+  if (-not $codexPackage) { throw '未找到 Microsoft Store 版 Codex（OpenAI.Codex）。' }
+  $initialCodexProcessIds = @(Get-CodexMainProcesses -PackageInstallLocation $codexPackageRoot |
+    ForEach-Object { [int]$_.ProcessId })
   $cdpReady = Test-CdpEndpoint
   if (-not $cdpReady) {
-    $codexProcesses = @(Get-CodexMainProcesses)
+    $codexProcesses = @(Get-CodexMainProcesses -PackageInstallLocation $codexPackageRoot)
     if ($codexProcesses.Count -gt 0) {
       $message = 'Codex 已经以普通方式运行，当前进程没有 Jira 面板所需的本机调试参数。'
       if ($Background) {
@@ -178,8 +205,8 @@ try {
         exit 2
       }
 
-      if (-not (Stop-CodexGracefully -Processes $codexProcesses)) {
-        $blockedMessage = 'Codex 仍在运行。请先从 Codex 菜单完全退出，再打开安装器创建的“Codex”快捷方式。安装器不会强制结束进程。'
+      if (-not (Stop-CodexGracefully -Processes $codexProcesses -PackageInstallLocation $codexPackageRoot)) {
+        $blockedMessage = 'Codex 仍有无法安全确认归属的窗口进程。请先从 Codex 菜单完全退出，再打开安装器创建的“Codex”快捷方式。'
         Write-LauncherStatus -State 'restart-blocked' -Message $blockedMessage -ExitCode 3
         $null = Show-Message -Text $blockedMessage -Icon Warning
         exit 3
@@ -200,7 +227,8 @@ try {
   }
 
   $codexStartedThisRun = @(
-    Get-CodexMainProcesses | Where-Object { [int]$_.ProcessId -notin $initialCodexProcessIds }
+    Get-CodexMainProcesses -PackageInstallLocation $codexPackageRoot |
+      Where-Object { [int]$_.ProcessId -notin $initialCodexProcessIds }
   ).Count -gt 0
   Complete-PendingUpdateAfterRestart -CodexStartedThisRun $codexStartedThisRun
 

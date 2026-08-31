@@ -231,6 +231,42 @@ test("Windows 优先发现 npm 独立 CLI，而不是依赖 Store 应用别名",
   assert.equal(discovered.source, "npm-vendor");
 });
 
+test("Windows 优先使用当前 Codex Desktop 同版本的内置 CLI", () => {
+  const expected = "C:\\Users\\tester\\AppData\\Local\\OpenAI\\Codex\\bin\\current\\codex.exe";
+  const older = "C:\\Users\\tester\\AppData\\Local\\OpenAI\\Codex\\bin\\older\\codex.exe";
+  const discovered = discoverCodexAppServerCommand({
+    env: {
+      LOCALAPPDATA: "C:\\Users\\tester\\AppData\\Local",
+      PATH: "D:\\node-global"
+    },
+    platform: "win32",
+    existsFn: (candidate) => [expected, older].includes(candidate),
+    readdirFn: () => [
+      { name: "older", isDirectory: () => true },
+      { name: "current", isDirectory: () => true }
+    ],
+    statFn: (candidate) => ({ mtimeMs: candidate === expected ? 200 : 100 })
+  });
+  assert.equal(discovered.command, expected);
+  assert.equal(discovered.source, "codex-desktop-bundled");
+});
+
+test("安装记录中的 CLI 只作为 Desktop CLI 缺失时的回退", () => {
+  const fallback = "D:\\node-global\\codex.exe";
+  const discovered = discoverCodexAppServerCommand({
+    env: {
+      LOCALAPPDATA: "C:\\Users\\tester\\AppData\\Local",
+      JIRA_WORKBENCH_FALLBACK_APP_SERVER_COMMAND: fallback,
+      PATH: ""
+    },
+    platform: "win32",
+    existsFn: (candidate) => candidate === fallback,
+    readdirFn: () => []
+  });
+  assert.equal(discovered.command, fallback);
+  assert.equal(discovered.source, "installed-fallback");
+});
+
 test("显式 App Server 命令优先于自动发现", () => {
   const discovered = discoverCodexAppServerCommand({
     command: "D:\\portable-codex\\codex.exe",

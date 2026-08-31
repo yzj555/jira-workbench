@@ -4,6 +4,11 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+$processHelperPath = Join-Path $PSScriptRoot 'codex-processes.ps1'
+if (-not (Test-Path -LiteralPath $processHelperPath)) {
+  throw "Codex process helper is missing: $processHelperPath"
+}
+. $processHelperPath
 
 function Test-CdpEndpoint {
   try {
@@ -14,19 +19,15 @@ function Test-CdpEndpoint {
   }
 }
 
-function Get-CodexMainProcesses {
-  @(Get-CimInstance Win32_Process -Filter "Name = 'ChatGPT.exe'" -ErrorAction SilentlyContinue | Where-Object {
-    (-not $_.CommandLine -or $_.CommandLine -notmatch '(?:^|\s)--type=') -and
-    (-not (Get-Process -Id $_.ProcessId -ErrorAction SilentlyContinue).HasExited)
-  })
-}
-
 if (Test-CdpEndpoint) {
   Write-Host "Codex CDP is already running on 127.0.0.1:$CdpPort."
   return
 }
 
-$runningCodex = @(Get-CodexMainProcesses)
+$package = Get-CodexStorePackage
+if (-not $package) { throw 'Microsoft Store package OpenAI.Codex was not found.' }
+$packageRoot = [string]$package.InstallLocation
+$runningCodex = @(Get-CodexMainProcesses -PackageInstallLocation $packageRoot)
 if ($runningCodex.Count -gt 0) {
   $debugArgumentPattern = "(?:^|\s)--remote-debugging-port(?:=|\s+)$CdpPort(?:\s|$)"
   $parameterizedCodex = @($runningCodex | Where-Object { $_.CommandLine -match $debugArgumentPattern })
@@ -43,8 +44,6 @@ if ($runningCodex.Count -gt 0) {
   throw 'Codex is already running without the Jira workbench launch parameters. Exit Codex completely, then use the Jira Workbench shortcut.'
 }
 
-$package = Get-AppxPackage -Name 'OpenAI.Codex'
-if (-not $package) { throw 'Microsoft Store package OpenAI.Codex was not found.' }
 New-Item -ItemType Directory -Path $ProfileDirectory -Force | Out-Null
 
 $source = @'

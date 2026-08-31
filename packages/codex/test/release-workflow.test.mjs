@@ -43,6 +43,7 @@ test("统一 Release 同时包含 Core、Codex 与 DSH 两侧适配包", async (
   assert.match(buildRelease, /packages\\dsh-client/);
   assert.match(buildRelease, /packages\\dsh\\plugin\.mjs/);
   assert.match(buildRelease, /packages\\dsh-client\\lib\\client\.js/);
+  assert.match(buildRelease, /packages\\codex\\scripts\\codex-processes\.ps1/);
 });
 
 test("Release 通过 Trusted Publishing 按 Core、Client、Host 顺序发布 npm 包", async () => {

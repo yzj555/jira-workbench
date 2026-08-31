@@ -663,7 +663,7 @@ export async function apply(ctx, config = {}) {
   const core = createCoreService({
     dataRoot: dshDataRoot(),
     configFile: dshConfigFile(),
-    version: config.version || "0.33.6",
+    version: config.version || "0.33.7",
     workspaceCatalog,
     ...(secretStore ? { secretStore } : {})
   });

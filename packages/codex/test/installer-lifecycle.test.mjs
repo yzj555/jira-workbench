@@ -9,13 +9,14 @@ import { fileURLToPath } from "node:url";
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 
 test("one lifecycle entry owns install, repair and uninstall", async () => {
-  const [command, lifecycle, install, uninstall, updater, launcher, restartHelper, manifestText] = await Promise.all([
+  const [command, lifecycle, install, uninstall, updater, launcher, processHelper, restartHelper, manifestText] = await Promise.all([
     readFile(join(root, "install.cmd"), "utf8"),
     readFile(join(root, "installer", "lifecycle.ps1"), "utf8"),
     readFile(join(root, "installer", "install.ps1"), "utf8"),
     readFile(join(root, "installer", "uninstall.ps1"), "utf8"),
     readFile(join(root, "installer", "update-bootstrap.ps1"), "utf8"),
     readFile(join(root, "scripts", "launch-codex-jira.ps1"), "utf8"),
+    readFile(join(root, "scripts", "codex-processes.ps1"), "utf8"),
     readFile(join(root, "scripts", "restart-codex-after-update.ps1"), "utf8"),
     readFile(join(root, "installer", "product-manifest.json"), "utf8")
   ]);
@@ -80,8 +81,16 @@ test("one lifecycle entry owns install, repair and uninstall", async () => {
   assert.match(launcher, /File\]::ReadAllText\(\$updateStatePath, \[System\.Text\.Encoding\]::UTF8\)/);
   assert.match(launcher, /File\]::WriteAllText\(\$temporary, \$json, \$utf8NoBom\)/);
   assert.match(launcher, /Add-Type -AssemblyName System\.Windows\.Forms[\s\S]*function Show-Message/);
-  assert.match(launcher, /HasExited/);
+  assert.match(processHelper, /HasExited/);
+  assert.match(launcher, /JIRA_WORKBENCH_FALLBACK_APP_SERVER_COMMAND/);
+  assert.match(launcher, /Where-Object \{ \$_\.PackageOwned \}/);
+  assert.match(processHelper, /PackageInstallLocation/);
+  assert.match(processHelper, /-not \$packageOwned -and -not \$hasVisibleWindow/);
+  assert.match(processHelper, /Find-CodexDesktopCliExecutable/);
   assert.match(restartHelper, /Stop-CodexForRestart/);
+  assert.match(restartHelper, /codex-processes\.ps1/);
+  assert.match(restartHelper, /PackageInstallLocation \$codexPackageRoot/);
+  assert.match(restartHelper, /Where-Object \{ \$_\.PackageOwned \}/);
   assert.match(restartHelper, /JiraWorkbenchWindowCloser/);
   assert.match(restartHelper, /RequestClose/);
   assert.match(restartHelper, /Stop-Process -Id \(\[int\]\$processInfo\.ProcessId\) -Force/);
@@ -120,6 +129,11 @@ test("one lifecycle entry owns install, repair and uninstall", async () => {
     component.id === "minimal-desktop-ui-host"
     && component.required
     && component.path === "packages/codex/injector.mjs"
+  )), true);
+  assert.equal(manifest.components.some((component) => (
+    component.id === "codex-process-discovery"
+    && component.required
+    && component.path === "packages/codex/scripts/codex-processes.ps1"
   )), true);
   assert.equal(manifest.components.some((component) => (
     component.id === "codex-application-commands"

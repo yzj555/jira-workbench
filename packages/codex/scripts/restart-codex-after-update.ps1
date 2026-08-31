@@ -16,6 +16,7 @@ $logDirectory = Join-Path $UserDataRoot 'updates\logs'
 $logPath = Join-Path $logDirectory 'restart.log'
 $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 New-Item -ItemType Directory -Path $logDirectory -Force | Out-Null
+$codexPackageRoot = ''
 
 function Write-RestartLog([string]$Message) {
   Add-Content -LiteralPath $logPath -Encoding UTF8 -Value ("[{0}] {1}" -f (Get-Date).ToString('o'), $Message)
@@ -54,13 +55,6 @@ function Write-UpdateState {
   $json = $next | ConvertTo-Json -Depth 8
   [System.IO.File]::WriteAllText($temporary, $json, $utf8NoBom)
   Move-Item -LiteralPath $temporary -Destination $StatePath -Force
-}
-
-function Get-CodexMainProcesses {
-  @(Get-CimInstance Win32_Process -Filter "Name = 'ChatGPT.exe'" -ErrorAction SilentlyContinue | Where-Object {
-    (-not $_.CommandLine -or $_.CommandLine -notmatch '(?:^|\s)--type=') -and
-    (-not (Get-Process -Id $_.ProcessId -ErrorAction SilentlyContinue).HasExited)
-  })
 }
 
 function Initialize-CodexWindowCloser {
@@ -109,14 +103,14 @@ public static class JiraWorkbenchWindowCloser {
 function Wait-CodexExit([int]$TimeoutSeconds) {
   $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
   while ((Get-Date) -lt $deadline) {
-    if (@(Get-CodexMainProcesses).Count -eq 0) { return $true }
+    if (@(Get-CodexMainProcesses -PackageInstallLocation $codexPackageRoot).Count -eq 0) { return $true }
     Start-Sleep -Milliseconds 400
   }
-  return @(Get-CodexMainProcesses).Count -eq 0
+  return @(Get-CodexMainProcesses -PackageInstallLocation $codexPackageRoot).Count -eq 0
 }
 
 function Stop-CodexForRestart([int]$GracefulTimeoutSeconds = 12, [int]$ForcedTimeoutSeconds = 8) {
-  $processes = @(Get-CodexMainProcesses)
+  $processes = @(Get-CodexMainProcesses -PackageInstallLocation $codexPackageRoot)
   if ($processes.Count -eq 0) { return $true }
 
   Initialize-CodexWindowCloser
@@ -134,10 +128,10 @@ function Stop-CodexForRestart([int]$GracefulTimeoutSeconds = 12, [int]$ForcedTim
   # the background. The user has explicitly confirmed a full restart, so only
   # after the graceful window-close deadline do we terminate the remaining
   # top-level Codex host processes. Child renderers exit with their host.
-  $remaining = @(Get-CodexMainProcesses)
+  $remaining = @(Get-CodexMainProcesses -PackageInstallLocation $codexPackageRoot)
   $remainingIds = @($remaining | ForEach-Object { [int]$_.ProcessId })
   Write-RestartLog "Normal close timed out; stopping residual Codex host process(es): $($remainingIds -join ', ')."
-  foreach ($processInfo in $remaining) {
+  foreach ($processInfo in @($remaining | Where-Object { $_.PackageOwned })) {
     Stop-Process -Id ([int]$processInfo.ProcessId) -Force -ErrorAction SilentlyContinue
   }
   return Wait-CodexExit -TimeoutSeconds $ForcedTimeoutSeconds
@@ -157,6 +151,15 @@ try {
       [string]$state.targetVersion -ne $installedVersion) {
     throw 'The pending update does not match the installed version.'
   }
+
+  $processHelperPath = Join-Path $PSScriptRoot 'codex-processes.ps1'
+  if (-not (Test-Path -LiteralPath $processHelperPath)) {
+    throw "Codex process helper is missing: $processHelperPath"
+  }
+  . $processHelperPath
+  $codexPackage = Get-CodexStorePackage
+  if (-not $codexPackage) { throw 'Microsoft Store package OpenAI.Codex was not found.' }
+  $codexPackageRoot = [string]$codexPackage.InstallLocation
 
   Write-UpdateState -Phase 'restarting' -Progress 99 -Message "Restarting Codex to finish applying v$installedVersion..."
   Write-RestartLog "Restart accepted for v$installedVersion."

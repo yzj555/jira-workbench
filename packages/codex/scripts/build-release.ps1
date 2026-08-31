@@ -60,6 +60,7 @@ try {
     'package-lock.json',
     'packages\codex\installer\update-bootstrap.ps1',
     'packages\codex\scripts\restart-codex-after-update.ps1',
+    'packages\codex\scripts\codex-processes.ps1',
     'packages\codex\lib\update-manager.mjs',
     'packages\core\mcp\ui\task-board.html',
     'packages\codex\plugins\jira-workbench-assistant\.codex-plugin\plugin.json',

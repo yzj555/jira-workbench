@@ -77,6 +77,11 @@ export function findCodexAppInitialAsset(rpcSource) {
   return String(rpcSource || "").match(/["']\.\/(app-initial-[A-Za-z0-9_-]+\.js)["']/)?.[1] || "";
 }
 
+export function findCodexRegisterAppActionsAsset(initialSource) {
+  return String(initialSource || "")
+    .match(/["']\.\/(register-app-actions-[A-Za-z0-9_-]+\.js)["']/)?.[1] || "";
+}
+
 function codexEntryUrls(documentRef) {
   return Array.from(documentRef?.scripts || [])
     .map((script) => String(script.src || ""))
@@ -133,6 +138,116 @@ export function findCodexHostRequest(initialModule) {
     || null;
 }
 
+export function isCodexAppServerManagerFactory(value) {
+  const source = codexFunctionSource(value);
+  if (!source || value.length !== 2) return false;
+  return /AppServerManager RPC is not connected/.test(source)
+    && /\.forHost\s*\(/.test(source);
+}
+
+export function findCodexAppServerManagerFactory(initialModule) {
+  return Object.values(initialModule || {})
+    .find(isCodexAppServerManagerFactory) || null;
+}
+
+export function isCodexLegacyDesktopRequestFunction(value) {
+  const source = codexFunctionSource(value);
+  if (!source || value.length !== 2) return false;
+  return /(?:\.|\b)sendRequest\s*\(/.test(source);
+}
+
+export function findCodexLegacyDesktopRequest(initialModule) {
+  const functions = Object.values(initialModule || {}).filter(isCodexLegacyDesktopRequestFunction);
+  return functions.find((value) => value.name === "tp") || functions[0] || null;
+}
+
+const CODEX_WORKBENCH_ACTIONS = Object.freeze({
+  request: "jira_workbench.app_server_request",
+  startConversation: "jira_workbench.start_conversation",
+  startTurn: "jira_workbench.start_turn"
+});
+
+function codexManagerForAction(managerFactory, context, hostId) {
+  const scope = context?.scope;
+  if (!scope) throw new Error("Codex 主窗口尚未提供 App Server 作用域。");
+  return managerFactory(scope, String(hostId || "local").trim() || "local");
+}
+
+function registerCodexWorkbenchActions(appActionRegistry, managerFactory) {
+  if (typeof appActionRegistry?.set !== "function") {
+    throw new Error("Codex 原生操作注册表不可用。");
+  }
+
+  appActionRegistry.set(CODEX_WORKBENCH_ACTIONS.request, async (action, context) => {
+    const manager = codexManagerForAction(managerFactory, context, action.hostId);
+    const method = String(action.method || "").trim();
+    if (!method) throw new Error("Codex App Server 请求缺少 method。");
+    const requestOptions = {
+      ...(action.source ? { source: action.source } : {}),
+      ...(action.priority ? { priority: action.priority } : {})
+    };
+    return Object.keys(requestOptions).length
+      ? manager.sendRequest(method, action.params ?? null, requestOptions)
+      : manager.sendRequest(method, action.params ?? null);
+  });
+
+  appActionRegistry.set(CODEX_WORKBENCH_ACTIONS.startConversation, async (action, context) => {
+    const manager = codexManagerForAction(managerFactory, context, action.hostId);
+    const clientThreadId = String(action.clientThreadId || "").trim()
+      || `client-new-thread:${globalThis.crypto?.randomUUID?.() || Date.now()}`;
+    const {
+      type: _type,
+      hostId: _hostId,
+      clientThreadId: _clientThreadId,
+      ...params
+    } = action;
+    return manager.startConversation(params, {
+      clientThreadId,
+      returnAfterOptimisticTurn: true
+    });
+  });
+
+  appActionRegistry.set(CODEX_WORKBENCH_ACTIONS.startTurn, async (action, context) => {
+    const manager = codexManagerForAction(managerFactory, context, action.hostId);
+    const conversationId = normalizeCodexThreadId(action.conversationId);
+    if (!conversationId) throw new Error("Codex 会话 ID 为空。");
+    const params = action.params && typeof action.params === "object" ? action.params : {};
+    const {
+      attachments,
+      useAppServerPermissionDefault,
+      usePermissionSelection,
+      ...request
+    } = params;
+    return manager.startTurn(conversationId, {
+      request: { ...request, threadId: conversationId },
+      context: {
+        ...(Array.isArray(attachments) ? { attachments } : {}),
+        ...(useAppServerPermissionDefault === true ? { useAppServerPermissionDefault: true } : {}),
+        ...(usePermissionSelection === true ? { usePermissionSelection: true } : {})
+      }
+    });
+  });
+}
+
+function createCodexDesktopRequest(appActions, appActionRegistry, managerFactory) {
+  registerCodexWorkbenchActions(appActionRegistry, managerFactory);
+  return (type, payload = {}) => {
+    let action;
+    if (type === "send-cli-request-for-host") {
+      action = { ...payload, type: CODEX_WORKBENCH_ACTIONS.request };
+    } else if (type === "start-conversation") {
+      action = { ...payload, type: CODEX_WORKBENCH_ACTIONS.startConversation };
+    } else if (type === "start-turn-for-host") {
+      action = { ...payload, type: CODEX_WORKBENCH_ACTIONS.startTurn };
+    } else {
+      throw new Error(`Codex 当前版本不支持桌面操作：${type}`);
+    }
+    return appActions.runInPrimaryWindow({ action });
+  };
+}
+
+const codexDesktopBridgeCache = new WeakMap();
+
 async function loadCodexAppActions({
   documentRef = globalThis.document,
   fetchFn = globalThis.fetch?.bind(globalThis),
@@ -163,7 +278,7 @@ async function loadCodexAppActions({
   throw lastError || new Error("无法连接 Codex 原生窗口服务。");
 }
 
-async function loadCodexDesktopBridge({
+async function resolveCodexDesktopBridge({
   documentRef = globalThis.document,
   fetchFn = globalThis.fetch?.bind(globalThis),
   importModule = (url) => import(url)
@@ -189,28 +304,76 @@ async function loadCodexDesktopBridge({
       if (!rpcResponse?.ok) throw new Error(`RPC 资源返回 HTTP ${rpcResponse?.status || "unknown"}`);
       const initialAsset = findCodexAppInitialAsset(await rpcResponse.text());
       if (!initialAsset) throw new Error("RPC 资源中未找到 Codex 应用运行时模块。");
-      const initialModule = await importModule(new URL(initialAsset, rpcUrl).href);
-      const requestFunctions = Object.values(initialModule || {}).filter((value) => {
-        if (typeof value !== "function") return false;
-        try {
-          return /(?:\.|\b)sendRequest\s*\(/.test(String(value));
-        } catch {
-          return false;
-        }
-      });
-      const request = requestFunctions.find((value) => value.name === "tp") || requestFunctions[0];
-      if (typeof request !== "function") throw new Error("Codex 当前会话请求通道不可用。");
+      const initialUrl = new URL(initialAsset, rpcUrl).href;
+      const [initialModule, initialResponse] = await Promise.all([
+        importModule(initialUrl),
+        fetchFn(initialUrl)
+      ]);
+      if (!initialResponse?.ok) {
+        throw new Error(`应用运行时资源返回 HTTP ${initialResponse?.status || "unknown"}`);
+      }
+      const initialSource = await initialResponse.text();
       const hostRequest = findCodexHostRequest(initialModule);
       const appActions = rpcModule?.appServices?.appActions;
       if (typeof appActions?.runInPrimaryWindow !== "function") {
         throw new Error("Codex 原生窗口服务不可用。");
       }
-      return { appActions, request, hostRequest };
+      let request = null;
+      let requestMode = "legacy-renderer";
+      const managerFactory = findCodexAppServerManagerFactory(initialModule);
+      const registerAsset = findCodexRegisterAppActionsAsset(initialSource);
+      if (managerFactory && registerAsset) {
+        const registryModule = await importModule(new URL(registerAsset, initialUrl).href);
+        if (registryModule?.appActionRegistry) {
+          request = createCodexDesktopRequest(
+            appActions,
+            registryModule.appActionRegistry,
+            managerFactory
+          );
+          requestMode = "native-app-server-manager";
+        }
+      }
+      request ||= findCodexLegacyDesktopRequest(initialModule);
+      if (typeof request !== "function") {
+        throw new Error("Codex 当前会话请求通道不可用；桌面版本可能已更新，请更新 Jira 工作台。");
+      }
+      return {
+        appActions,
+        request,
+        hostRequest,
+        requestMode
+      };
     } catch (error) {
       lastError = error;
     }
   }
   throw lastError || new Error("无法连接 Codex 桌面桥接。");
+}
+
+async function loadCodexDesktopBridge(options = {}) {
+  const documentRef = options.documentRef ?? globalThis.document;
+  const cacheable = documentRef != null
+    && (typeof documentRef === "object" || typeof documentRef === "function");
+  if (!cacheable) return resolveCodexDesktopBridge(options);
+
+  const entryKey = codexEntryUrls(documentRef).join("\n");
+  if (!entryKey) return resolveCodexDesktopBridge(options);
+  let documentCache = codexDesktopBridgeCache.get(documentRef);
+  if (!documentCache) {
+    documentCache = new Map();
+    codexDesktopBridgeCache.set(documentRef, documentCache);
+  }
+  const cached = documentCache.get(entryKey);
+  if (cached) return cached;
+
+  const pending = resolveCodexDesktopBridge({ ...options, documentRef });
+  documentCache.set(entryKey, pending);
+  try {
+    return await pending;
+  } catch (error) {
+    if (documentCache.get(entryKey) === pending) documentCache.delete(entryKey);
+    throw error;
+  }
 }
 
 function codexThreadHost(summary, threadId) {

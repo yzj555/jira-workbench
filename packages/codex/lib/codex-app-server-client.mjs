@@ -1,6 +1,6 @@
 import { EventEmitter } from "node:events";
 import { spawn as spawnProcess } from "node:child_process";
-import { existsSync } from "node:fs";
+import { existsSync, readdirSync, statSync } from "node:fs";
 import { delimiter, join } from "node:path";
 import readline from "node:readline";
 
@@ -120,24 +120,83 @@ function windowsNpmCodexCandidates(root) {
   ]);
 }
 
+function windowsDesktopCodexCandidates(env, {
+  existsFn = existsSync,
+  readdirFn = readdirSync,
+  statFn = statSync
+} = {}) {
+  const localAppData = String(env.LOCALAPPDATA || env.LocalAppData || "").trim();
+  if (!localAppData) return [];
+  const binRoot = join(localAppData, "OpenAI", "Codex", "bin");
+  let entries = [];
+  try {
+    entries = readdirFn(binRoot, { withFileTypes: true });
+  } catch {
+    return [];
+  }
+  return entries.flatMap((entry) => {
+    const name = String(entry?.name || "").trim();
+    if (!name || typeof entry?.isDirectory === "function" && !entry.isDirectory()) return [];
+    const candidate = join(binRoot, name, "codex.exe");
+    if (!safeExists(candidate, existsFn)) return [];
+    let modifiedAt = 0;
+    try { modifiedAt = Number(statFn(candidate)?.mtimeMs || 0); } catch {}
+    return [{ candidate, modifiedAt }];
+  }).sort((left, right) => right.modifiedAt - left.modifiedAt)
+    .map(({ candidate }) => candidate);
+}
+
 export function discoverCodexAppServerCommand({
   command,
   env = process.env,
   platform = process.platform,
-  existsFn = existsSync
+  existsFn = existsSync,
+  readdirFn = readdirSync,
+  statFn = statSync
 } = {}) {
-  const explicit = String(
-    command || env.JIRA_WORKBENCH_APP_SERVER_COMMAND || env.CODEX_CLI_PATH || ""
-  ).trim();
-  if (explicit) {
+  const optionCommand = String(command || "").trim();
+  if (optionCommand) {
     return {
-      command: explicit,
-      source: command ? "option" : "environment",
+      command: optionCommand,
+      source: "option",
+      installCommand: CODEX_CLI_INSTALL_COMMAND
+    };
+  }
+
+  const environmentCommand = String(
+    env.JIRA_WORKBENCH_APP_SERVER_COMMAND || env.CODEX_CLI_PATH || ""
+  ).trim();
+  if (environmentCommand) {
+    return {
+      command: environmentCommand,
+      source: "environment",
       installCommand: CODEX_CLI_INSTALL_COMMAND
     };
   }
 
   if (platform === "win32") {
+    const [desktopCandidate] = windowsDesktopCodexCandidates(env, {
+      existsFn,
+      readdirFn,
+      statFn
+    });
+    if (desktopCandidate) {
+      return {
+        command: desktopCandidate,
+        source: "codex-desktop-bundled",
+        installCommand: CODEX_CLI_INSTALL_COMMAND
+      };
+    }
+
+    const installedFallback = String(env.JIRA_WORKBENCH_FALLBACK_APP_SERVER_COMMAND || "").trim();
+    if (safeExists(installedFallback, existsFn)) {
+      return {
+        command: installedFallback,
+        source: "installed-fallback",
+        installCommand: CODEX_CLI_INSTALL_COMMAND
+      };
+    }
+
     const roots = new Set([
       env.npm_config_prefix,
       env.APPDATA ? join(env.APPDATA, "npm") : "",

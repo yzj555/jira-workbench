@@ -3,7 +3,10 @@ import assert from "node:assert/strict";
 import {
   CODEX_DESKTOP_APP_SERVER_HOST_ID,
   createCodexDesktopAppServerHostAdapter,
+  findCodexAppServerManagerFactory,
   findCodexAppInitialAsset,
+  findCodexLegacyDesktopRequest,
+  findCodexRegisterAppActionsAsset,
   findCodexRpcAsset,
   interruptCodexThreadTurn,
   isProvisionalCodexThreadId,
@@ -22,6 +25,7 @@ function createBridgeHarness({
   canAcceptDirectInput = true,
   sidebarThreadId = "",
   latestHostBridge = false,
+  nativeManagerBridge = false,
   threadStatus = "idle",
   threadPath = "C:\\Users\\tester\\.codex\\sessions\\rollout.jsonl"
 } = {}) {
@@ -111,13 +115,45 @@ function createBridgeHarness({
     void source;
     return handleHostRequest(type, { ...payload, params });
   }
+  const appActionRegistry = new Map();
+  const manager = {
+    sendRequest: async (method, params, requestOptions) => sendRequest("send-cli-request-for-host", {
+      hostId: "local",
+      method,
+      params,
+      ...requestOptions
+    }),
+    startConversation: async (params, managerOptions) => {
+      calls.push({ channel: "manager", type: "start-conversation", params, managerOptions });
+      return threadId;
+    },
+    startTurn: async (conversationId, turn) => {
+      calls.push({ channel: "manager", type: "start-turn-for-host", conversationId, turn });
+      return { turn: { id: "turn-review" } };
+    }
+  };
+  const scope = {
+    get() {
+      return { forHost: () => manager };
+    }
+  };
+  function qg(scopeValue, hostId) {
+    const appServerManager = scopeValue.get("AppServerManager RPC");
+    if (appServerManager == null) throw new Error("AppServerManager RPC is not connected");
+    return appServerManager.forHost(hostId);
+  }
   const options = {
     documentRef: { scripts: [{ src: "app://-/assets/index-hash.js" }] },
     fetchFn: async (url) => ({
       ok: true,
-      text: async () => url.endsWith("index-hash.js")
-        ? 'import("./rpc-hash.js");'
-        : 'import("./app-initial-hash.js");'
+      text: async () => {
+        if (url.endsWith("index-hash.js")) return 'import("./rpc-hash.js");';
+        if (url.endsWith("rpc-hash.js")) return 'import("./app-initial-hash.js");';
+        if (url.endsWith("app-initial-hash.js") && nativeManagerBridge) {
+          return 'import("./register-app-actions-native.js");';
+        }
+        return "";
+      }
     }),
     importModule: async (url) => {
       if (url.endsWith("rpc-hash.js")) {
@@ -126,6 +162,8 @@ function createBridgeHarness({
             appActions: {
               runInPrimaryWindow: async (request) => {
                 calls.push({ channel: "action", request });
+                const handler = appActionRegistry.get(request?.action?.type);
+                if (handler) return handler(request.action, { scope });
                 return {
                   window: {
                     thread: { id: threadId, hostId: "local" },
@@ -147,7 +185,15 @@ function createBridgeHarness({
       if (url.endsWith("app-initial-hash.js")) {
         const hostileProxy = function hostileProxy() {};
         hostileProxy.toString = () => { throw new Error("proxy cannot be stringified"); };
-        return { A0: hostileProxy, Mht: latestHostBridge ? hm : vp, Xht: tp };
+        return {
+          A0: hostileProxy,
+          Mht: latestHostBridge ? hm : vp,
+          ...(nativeManagerBridge ? { qAt: qg } : { Xht: tp })
+        };
+      }
+      if (url.endsWith("register-app-actions-native.js")) {
+        calls.push({ channel: "registry-import", url });
+        return { appActionRegistry };
       }
       throw new Error(`unexpected module: ${url}`);
     }
@@ -166,6 +212,53 @@ test("最新版 Codex 的 hm 主机请求桥接可按语义识别", async () => 
     true
   );
   assert.equal(harness.calls.some((call) => call.type === "start-conversation"), true);
+});
+
+test("新版 Codex 通过主窗口 App Server manager 创建会话，不误选普通 sendRequest 函数", async () => {
+  const harness = createBridgeHarness({ nativeManagerBridge: true });
+  const started = await startCodexConversation("分析 Jira CT-13350", {
+    ...harness.options,
+    projectId: "local-project"
+  });
+  assert.equal(started.threadId, harness.threadId);
+  const managerCall = harness.calls.find((call) => call.channel === "manager"
+    && call.type === "start-conversation");
+  assert.equal(managerCall.params.cwd, "F:\\football\\server_v3\\server\\captain_tsubasa_server");
+  assert.equal(managerCall.managerOptions.returnAfterOptimisticTurn, true);
+  assert.match(managerCall.managerOptions.clientThreadId, /^client-new-thread:/);
+});
+
+test("新版 Codex manager 可读取既有会话并启动后续 turn", async () => {
+  const harness = createBridgeHarness({ nativeManagerBridge: true });
+  const state = await readCodexThreadState(harness.threadId, harness.options);
+  assert.equal(state.threadId, harness.threadId);
+  assert.equal(state.busy, false);
+
+  const started = await startCodexThreadTurn(harness.threadId, "继续处理 Jira", {
+    ...harness.options,
+    knownLoadedThread: true,
+    hostId: "local",
+    attachments: [{ name: "context.txt", path: "C:\\review\\context.txt" }]
+  });
+  assert.equal(started.turnId, "turn-review");
+  const managerTurn = harness.calls.find((call) => call.channel === "manager"
+    && call.type === "start-turn-for-host");
+  assert.equal(managerTurn.conversationId, harness.threadId);
+  assert.equal(managerTurn.turn.request.threadId, harness.threadId);
+  assert.equal(managerTurn.turn.request.input[0].text, "继续处理 Jira");
+  assert.deepEqual(managerTurn.turn.context.attachments, [{
+    label: "context.txt",
+    path: "C:\\review\\context.txt",
+    fsPath: "C:\\review\\context.txt"
+  }]);
+});
+
+test("同一 Codex 页面会复用已解析的桌面桥接", async () => {
+  const harness = createBridgeHarness({ nativeManagerBridge: true });
+  await readCodexThreadState(harness.threadId, harness.options);
+  await readCodexThreadState(harness.threadId, harness.options);
+  const registryImports = harness.calls.filter((call) => call.channel === "registry-import");
+  assert.equal(registryImports.length, 1);
 });
 
 test("Codex 会话 ID 会移除本地主机前缀", () => {
@@ -238,6 +331,27 @@ test("从 Codex 入口资源发现带哈希的 RPC 模块", () => {
     findCodexAppInitialAsset('import("./app-initial-Gl25w_2b.js");'),
     "app-initial-Gl25w_2b.js"
   );
+  assert.equal(
+    findCodexRegisterAppActionsAsset('import("./register-app-actions-BAqr70BQ.js");'),
+    "register-app-actions-BAqr70BQ.js"
+  );
+});
+
+test("桌面桥接只选择真实的 manager factory 和双参数 legacy request", () => {
+  function unrelated(scope, hostId, enabled, options) {
+    return scope.get(hostId).sendRequest(enabled, options);
+  }
+  function qg(scope, hostId) {
+    const manager = scope.get("AppServerManager RPC");
+    if (manager == null) throw new Error("AppServerManager RPC is not connected");
+    return manager.forHost(hostId);
+  }
+  function tp(type, payload) {
+    return sendRequest(type, payload);
+  }
+  function sendRequest() {}
+  assert.equal(findCodexAppServerManagerFactory({ unrelated, qg }), qg);
+  assert.equal(findCodexLegacyDesktopRequest({ unrelated, tp }), tp);
 });
 
 test("Codex 当前会话桥接可读取状态并启动真实审查 turn", async () => {

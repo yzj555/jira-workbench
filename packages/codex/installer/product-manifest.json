@@ -55,6 +55,11 @@
       "path": "packages/codex/inject/client.js"
     },
     {
+      "id": "codex-process-discovery",
+      "required": true,
+      "path": "packages/codex/scripts/codex-processes.ps1"
+    },
+    {
       "id": "embedded-panel-builder",
       "required": true,
       "path": "packages/codex/lib/panel-document.mjs"

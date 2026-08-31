@@ -61,7 +61,7 @@ export function createCoreService({
   secretStore,
   workspaceCatalog,
   approvalProvider,
-  version = "0.33.6"
+  version = "0.33.7"
 } = {}) {
   const configStore = createConfigStore({ configFile, ...(secretStore ? { secretStore } : {}) });
   const jira = createJiraClient();
