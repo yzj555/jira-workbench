@@ -22,7 +22,7 @@ flowchart LR
     UI["@jira-workbench/dsh-client<br/>设置 / 工作台 / 会话浮窗"]
     Host["@jira-workbench/dsh<br/>Cordis Host 插件"]
     Core["@jira-workbench/core<br/>Jira / JXL / SVN 业务核"]
-    Providers["DSH providers<br/>credentials / approval<br/>workspaceRegistry / sessionQuery / apiProxy / agentDefaultModel"]
+    Providers["DSH providers<br/>credentials / approval<br/>workspaceRegistry / sessionQuery / sessionController / sessionSkillCatalog / agentDefaultModel"]
     Jira["Jira Data Center / JXL"]
     SVN["SVN 工作副本 / 仓库"]
     Data["$DSH_HOME/jira-workbench"]
@@ -47,19 +47,21 @@ Core 提供宿主无关的服务与工具定义：Jira 查询、父子上下文�
 - 注入 DSH credential-reference secret store 和 approval provider。
 - 把 Core 工具注册到 `ctx.tools`，保留读写与开放世界安全注解。
 - 从 `workspaceRegistry` 提供项目目录，从 `sessionQuery` 提供会话目录。
-- 通过 `apiProxy` 创建原生会话、发送首条分析消息、读取 Skill 并跳转会话。
+- 通过 `sessionController` 创建原生会话、发送首条分析消息，通过 `sessionSkillCatalog` 读取 Skill；会话导航归 Client 的 `uiWorkspace` 所有。
 - 提供同源工作台路由、设置 namespace、会话关联摘要和浏览器操作接口。
 
 ### 2.3 DSH Client
 
 `@jira-workbench/dsh-client` 注册 DSH 原生浏览器扩展点：
 
-- `settings.plugin.item`：只显示 Jira 地址和 PAT 配置状态。
+- `plugins.bundle.config`：在插件详情只显示 Jira 地址和 PAT 配置状态；通过 `configForms` 绑定 Host 的原生 `Config`。
 - `sidebar.footer.action`：打开中心任务工作区。
 - `shell.overlay`：在中心区域承载任务首页、详情、设置、关联管理和 SVN 审核。
 - 会话 header action：只在当前 DSH 会话存在 Jira 关联时显示入口，并从入口附近展开浮窗。
 
 Client 不保存 Jira PAT、绑定 revision、审核快照或提交令牌。页面重新加载后从 Host 重新读取状态。
+
+DSH `0.2.0-rc.2` 的原生 `Config` / `configForms` 替代旧 settings namespace。连接地址仍以 Core 已落盘配置为准：Host 负责启动时迁移原生字段，Client 仅在用户明确保存成功后镜像地址，不因初始读取或配置通知反写旧快照。Token 只通过 credentials 引用读写。
 
 ## 3. Provider 约定
 
@@ -116,7 +118,7 @@ Codex 已提供对应 reader。DSH 初版没有会话语义审查 provider，使
 3. 解析会话当前模型能力：支持图片则发送原图与来源；明确不支持时，优先将这个新 Jira 会话切到配置的图片模型并发送原图。由于 DSH 不允许含图片历史的会话再切回文本模型，该会话会继续使用图片模型，但插件立即恢复未来新会话的默认模型。无法安全切换或 Host 仍拒绝图片时，再按视觉解析、本地 OCR、明确未解析提示顺序降级。视觉/OCR 成功结果以附件 ID 与文件 SHA-256 为键缓存，失败不长期缓存。
 4. 发送首条只读分析消息；Skill 可用时以 Skill 约束为准，模板补充 Jira 上下文。
 5. Host 接受消息后才使用预期 revision 保存绑定。
-6. 绑定成功后由 DSH 原生 session API 打开会话。
+6. 绑定成功、会话列表同步后由 DSH 原生 `uiWorkspace.openSession()` 打开会话。
 
 创建成功但 CAS 冲突时保留已创建会话，并明确返回“已创建但未绑定”，不会静默覆盖另一客户端的新绑定。
 

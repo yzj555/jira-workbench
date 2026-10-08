@@ -46,9 +46,6 @@ function clsx() {
 }
 var clsx_default = clsx;
 
-// src/client/JiraConfigCard.tsx
-var import_dsh_client_ui_primitives = require("@deepseek-ai/dsh-client-ui-primitives");
-
 // src/client/JiraConfigCard.module.css
 var css = '.Dlj8CW_card{--jira-accent:#4c72d9;--jira-accent-soft:color-mix(in srgb, var(--jira-accent) 10%, transparent);--jira-bug:#c45b50;--jira-ok:#3b9164;border:1px solid var(--dsw-alias-border-l2);background:var(--dsw-alias-bg-layer-3);border-radius:12px;list-style:none;transition:border-color .16s;overflow:hidden}.Dlj8CW_card,.Dlj8CW_card *,.Dlj8CW_card :before,.Dlj8CW_card :after{box-sizing:border-box}.Dlj8CW_card:hover,.Dlj8CW_cardOpen{border-color:color-mix(in srgb, var(--jira-accent) 30%, var(--dsw-alias-border-l2))}.Dlj8CW_cardOpen{overflow:visible}.Dlj8CW_pluginCard{width:100%}.Dlj8CW_pluginCard .Dlj8CW_header{padding:14px 15px}.Dlj8CW_pluginCard .Dlj8CW_description{white-space:normal;-webkit-line-clamp:2;-webkit-box-orient:vertical;display:-webkit-box;overflow:hidden}.Dlj8CW_pluginCard .Dlj8CW_section{padding:18px 16px 16px}.Dlj8CW_pluginCard .Dlj8CW_connectionGrid{grid-template-columns:1fr;gap:16px}.Dlj8CW_pluginCard .Dlj8CW_footer{grid-template-columns:minmax(0,1fr) auto auto;padding:12px 16px 14px;display:grid}.Dlj8CW_workspaceCard{background:linear-gradient(180deg, color-mix(in srgb, var(--jira-accent) 2.5%, var(--dsw-alias-bg-base)) 0, var(--dsw-alias-bg-base) 170px), var(--dsw-alias-bg-base);border:0;border-radius:0;flex-direction:column;width:100%;height:100%;min-height:0;display:flex;overflow:hidden}.Dlj8CW_workspaceCard:hover,.Dlj8CW_workspaceCard.Dlj8CW_cardOpen{border-color:#0000}.Dlj8CW_workspaceCard .Dlj8CW_body{border-top:0;flex:1;grid-template-rows:minmax(0,1fr) auto;grid-template-columns:188px minmax(0,1fr);min-height:0;display:grid;overflow:hidden}.Dlj8CW_workspaceCard .Dlj8CW_settingsNav{grid-area:1/1}.Dlj8CW_workspaceCard .Dlj8CW_settingsContent{scroll-behavior:smooth;scrollbar-gutter:stable;grid-area:1/2;min-width:0;min-height:0;overflow:auto;container:Dlj8CW_jira-settings-content/inline-size}.Dlj8CW_workspaceCard .Dlj8CW_section,.Dlj8CW_workspaceCard .Dlj8CW_loading{width:min(100%,1040px);margin:0 auto;padding:34px 32px 46px}.Dlj8CW_workspaceCard .Dlj8CW_section{scroll-margin-top:0}.Dlj8CW_workspaceCard .Dlj8CW_section+.Dlj8CW_section{border-top:1px solid color-mix(in srgb, var(--dsw-alias-border-l2) 78%, transparent)}.Dlj8CW_workspaceCard .Dlj8CW_footer{background:var(--dsw-alias-bg-layer-3);grid-area:2/1/auto/-1;padding-left:max(26px,50% - 494px);padding-right:max(26px,50% - 494px)}.Dlj8CW_header{appearance:none;width:100%;color:inherit;cursor:pointer;font:inherit;text-align:left;background:0 0;border:0;border-radius:12px;align-items:center;gap:12px;padding:15px 17px;display:flex}.Dlj8CW_header:focus,.Dlj8CW_settingsNavItem:focus,.Dlj8CW_choiceTrigger:focus,.Dlj8CW_choiceRow:focus,.Dlj8CW_segment:focus,.Dlj8CW_templateMode button:focus,.Dlj8CW_refresh:focus,.Dlj8CW_discard:focus,.Dlj8CW_save:focus{outline:0}.Dlj8CW_choiceRow:focus-visible,.Dlj8CW_refresh:focus-visible,.Dlj8CW_discard:focus-visible,.Dlj8CW_save:focus-visible{box-shadow:inset 0 0 0 2px color-mix(in srgb, var(--jira-accent) 54%, transparent);outline:0}.Dlj8CW_header:focus-visible{box-shadow:none}.Dlj8CW_settingsNavItem:focus-visible,.Dlj8CW_choiceTrigger:focus-visible,.Dlj8CW_segment:focus-visible,.Dlj8CW_templateMode button:focus-visible{background:var(--jira-accent-soft);box-shadow:none}.Dlj8CW_brandMark{background:var(--jira-accent-soft);width:34px;height:34px;color:var(--jira-accent);letter-spacing:.04em;border-radius:9px;flex:none;place-items:center;font-size:11px;font-weight:750;display:grid}.Dlj8CW_headText{flex-direction:column;flex:1;gap:3px;min-width:0;display:flex}.Dlj8CW_name{color:var(--dsw-alias-label-primary);font-size:15px;font-weight:650;line-height:1.35}.Dlj8CW_description{color:var(--dsw-alias-label-tertiary);text-overflow:ellipsis;white-space:nowrap;font-size:12px;line-height:1.45;overflow:hidden}.Dlj8CW_pending,.Dlj8CW_status,.Dlj8CW_templateState{background:var(--dsw-alias-bg-module-platform);color:var(--dsw-alias-label-tertiary);white-space:nowrap;border-radius:999px;flex:none;padding:2px 7px;font-size:10px;font-weight:600;line-height:17px}.Dlj8CW_statusOk{background:color-mix(in srgb, var(--jira-ok) 11%, transparent);color:var(--jira-ok)}.Dlj8CW_chevron{color:var(--dsw-alias-label-tertiary);flex:none;transition:transform .16s}.Dlj8CW_chevronOpen{transform:rotate(180deg)}.Dlj8CW_body{border-top:1px solid var(--dsw-alias-border-l2)}.Dlj8CW_settingsNav{border-right:1px solid var(--dsw-alias-border-l2);background:color-mix(in srgb, var(--dsw-alias-bg-layer-2) 34%, var(--dsw-alias-bg-base));flex-direction:column;gap:1px;min-width:0;padding:28px 16px;display:flex}.Dlj8CW_settingsNavItem{appearance:none;min-height:54px;color:var(--dsw-alias-label-tertiary);cursor:pointer;box-shadow:none;font:inherit;text-align:left;background:0 0;border:0;border-radius:6px;padding:9px 10px 9px 17px;transition:background .14s,color .14s;position:relative}.Dlj8CW_settingsNavItem:before{content:"";background:0 0;border-radius:2px;width:2px;transition:background .14s,transform .14s;position:absolute;top:11px;bottom:11px;left:0}.Dlj8CW_settingsNavItem strong,.Dlj8CW_settingsNavItem small{display:block}.Dlj8CW_settingsNavItem strong{font-size:12px;font-weight:650;line-height:1.5}.Dlj8CW_settingsNavItem small{color:var(--dsw-alias-label-tertiary);margin-top:1px;font-size:10px;line-height:1.45}.Dlj8CW_settingsNavItem:hover{background:color-mix(in srgb, var(--jira-accent) 5%, transparent);color:var(--dsw-alias-label-primary)}.Dlj8CW_settingsNavItem:hover:before{background:color-mix(in srgb, var(--jira-accent) 30%, transparent)}.Dlj8CW_settingsNavItemActive{background:color-mix(in srgb, var(--jira-accent) 7%, transparent);color:var(--jira-accent);box-shadow:none}.Dlj8CW_settingsNavItemActive:before{background:var(--jira-accent);transform:scaleY(1.08)}.Dlj8CW_settingsNavItemActive small{color:color-mix(in srgb, var(--jira-accent) 72%, var(--dsw-alias-label-tertiary))}.Dlj8CW_loading{color:var(--dsw-alias-label-tertiary);text-align:center;padding:38px 20px}.Dlj8CW_section{padding:20px 18px 22px}.Dlj8CW_sectionHeading{border-bottom:1px solid color-mix(in srgb, var(--dsw-alias-border-l2) 82%, transparent);max-width:none;margin-bottom:20px;padding:0 0 14px}.Dlj8CW_pluginConnectionHead{justify-content:space-between;align-items:flex-start;gap:16px;max-width:720px;margin-bottom:18px;display:flex}.Dlj8CW_pluginConnectionHead h3{color:var(--dsw-alias-label-primary);margin:0 0 3px;font-size:15px;font-weight:650;line-height:1.4}.Dlj8CW_pluginConnectionHead p{color:var(--dsw-alias-label-tertiary);margin:0;font-size:12px;line-height:1.55}.Dlj8CW_pluginSettingsNote{border-left:2px solid color-mix(in srgb, var(--jira-accent) 52%, transparent);color:var(--dsw-alias-label-tertiary);margin:17px 0 0;padding-left:10px;font-size:11px;line-height:1.55}.Dlj8CW_sectionHeading h3{color:var(--dsw-alias-label-primary);margin:0 0 3px;font-size:16px;font-weight:650}.Dlj8CW_sectionHeading p,.Dlj8CW_modeHint,.Dlj8CW_skillRule,.Dlj8CW_optionMessage,.Dlj8CW_saveHint,.Dlj8CW_readOnly{color:var(--dsw-alias-label-tertiary);margin:0;font-size:12px;line-height:1.55}.Dlj8CW_readOnly,.Dlj8CW_optionMessage{margin-bottom:12px}.Dlj8CW_connectionGrid,.Dlj8CW_sourceGrid,.Dlj8CW_templateGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;display:grid}.Dlj8CW_sourceGrid,.Dlj8CW_templateGrid{border-top:1px solid color-mix(in srgb, var(--dsw-alias-border-l2) 84%, transparent);border-bottom:1px solid color-mix(in srgb, var(--dsw-alias-border-l2) 84%, transparent);background:color-mix(in srgb, var(--dsw-alias-bg-layer-2) 26%, transparent);gap:0}.Dlj8CW_field,.Dlj8CW_pickerField{flex-direction:column;gap:6px;min-width:0;display:flex}.Dlj8CW_labelRow,.Dlj8CW_sourceToolbar,.Dlj8CW_panelTitle{align-items:center;gap:8px;display:flex}.Dlj8CW_labelRow{justify-content:space-between}.Dlj8CW_label{color:var(--dsw-alias-label-primary);font-size:12px;font-weight:600;line-height:1.5}.Dlj8CW_input,.Dlj8CW_textarea,.Dlj8CW_templateTextarea,.Dlj8CW_searchInput{border:1px solid var(--dsw-alias-border-l2);background:var(--dsw-alias-bg-layer-3);width:100%;color:var(--dsw-alias-label-primary);font:inherit;border-radius:9px;outline:0;font-size:12px;transition:border-color .14s,box-shadow .14s,background .14s}.Dlj8CW_input,.Dlj8CW_searchInput{height:36px;padding:0 11px}.Dlj8CW_textarea,.Dlj8CW_templateTextarea{resize:vertical;padding:9px 11px;line-height:1.55}.Dlj8CW_input:focus,.Dlj8CW_textarea:focus,.Dlj8CW_templateTextarea:focus,.Dlj8CW_searchInput:focus{border-color:var(--jira-accent);box-shadow:0 0 0 3px var(--jira-accent-soft)}.Dlj8CW_input:disabled{color:var(--dsw-alias-label-tertiary);cursor:default}.Dlj8CW_inputInvalid{border-color:var(--dsw-alias-label-error);}.Dlj8CW_invalid,.Dlj8CW_failed{color:var(--dsw-alias-label-error);margin:0;font-size:12px;line-height:1.5}.Dlj8CW_hint{color:var(--dsw-alias-label-tertiary);overflow-wrap:anywhere;margin:0;font-size:11px;line-height:1.5}.Dlj8CW_sourceToolbar{justify-content:flex-start;align-items:flex-end;gap:10px;margin-bottom:18px}.Dlj8CW_sourceToolbar .Dlj8CW_pickerField{width:min(560px,100% - 130px)}.Dlj8CW_refresh,.Dlj8CW_discard,.Dlj8CW_save{appearance:none;cursor:pointer;background:var(--dsw-alias-bg-layer-2);min-height:34px;color:var(--dsw-alias-label-secondary);font:inherit;border:0;border-radius:8px;padding:5px 13px;font-size:12px;font-weight:600;transition:background .14s,color .14s,box-shadow .14s,transform .14s}.Dlj8CW_refresh{background:color-mix(in srgb, var(--jira-accent) 9%, var(--dsw-alias-bg-layer-3));min-height:40px;color:var(--jira-accent);box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--jira-accent) 16%, transparent);align-items:center;gap:7px;padding:6px 14px 6px 11px;display:inline-flex}.Dlj8CW_refresh:hover:not(:disabled),.Dlj8CW_discard:hover:not(:disabled){background:color-mix(in srgb, var(--jira-accent) 14%, var(--dsw-alias-bg-layer-3));color:var(--jira-accent)}.Dlj8CW_refresh:hover:not(:disabled){box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--jira-accent) 26%, transparent);transform:translateY(-1px)}.Dlj8CW_refreshIcon{background:color-mix(in srgb, var(--jira-accent) 11%, transparent);border-radius:6px;place-items:center;width:20px;height:20px;font-size:15px;font-weight:500;line-height:1;display:grid}.Dlj8CW_refreshIconBusy{animation:.9s linear infinite Dlj8CW_refreshSpin}@keyframes Dlj8CW_refreshSpin{to{transform:rotate(360deg)}}.Dlj8CW_sourcePanel,.Dlj8CW_templatePanel{--panel-accent:var(--jira-accent);min-width:0;box-shadow:none;background:0 0;border-radius:0;padding:16px 22px 18px;overflow:visible}.Dlj8CW_bug{--panel-accent:var(--jira-bug)}.Dlj8CW_sourcePanel+.Dlj8CW_sourcePanel,.Dlj8CW_templatePanel+.Dlj8CW_templatePanel{border-left:1px solid color-mix(in srgb, var(--dsw-alias-border-l2) 82%, transparent)}.Dlj8CW_panelTitle{min-height:26px;margin-bottom:8px}.Dlj8CW_panelTitle strong{color:var(--dsw-alias-label-primary);flex:1;font-size:13px;font-weight:650}.Dlj8CW_kindDot{background:var(--jira-accent);border-radius:50%;flex:none;width:7px;height:7px}.Dlj8CW_bug .Dlj8CW_kindDot{background:var(--jira-bug)}.Dlj8CW_segmented,.Dlj8CW_templateMode{border-bottom:1px solid color-mix(in srgb, var(--dsw-alias-border-l2) 82%, transparent);box-shadow:none;background:0 0;border-radius:0;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;margin-bottom:12px;padding:0;display:grid}.Dlj8CW_segment,.Dlj8CW_templateMode button{appearance:none;min-height:34px;color:var(--dsw-alias-label-tertiary);cursor:pointer;font:inherit;background:0 0;border:0;border-radius:0;padding:4px 7px;font-size:11px;font-weight:600;transition:background .14s,color .14s,box-shadow .14s,transform .14s;position:relative}.Dlj8CW_segment:hover,.Dlj8CW_templateMode button:hover{background:color-mix(in srgb, var(--panel-accent) 4%, transparent);color:var(--dsw-alias-label-primary)}.Dlj8CW_segmentActive,.Dlj8CW_templateModeActive{box-shadow:inset 0 -2px 0 color-mix(in srgb, var(--panel-accent) 78%, transparent);background:color-mix(in srgb, var(--panel-accent) 5%, transparent)!important;color:var(--panel-accent)!important}.Dlj8CW_modeHint{min-height:54px;padding:10px 2px 0}.Dlj8CW_filterPicker{border:1px solid color-mix(in srgb, var(--dsw-alias-border-l2) 84%, transparent);background:var(--dsw-alias-bg-layer-3);border-radius:8px;gap:0;display:grid;overflow:hidden}.Dlj8CW_filterPicker .Dlj8CW_searchInput{border:0;border-bottom:1px solid color-mix(in srgb, var(--dsw-alias-border-l2) 78%, transparent);background:0 0;border-radius:0}.Dlj8CW_filterList,.Dlj8CW_choiceList{gap:3px;max-height:205px;padding:3px;display:grid;overflow:auto}.Dlj8CW_filterList{background:0 0;border:0;border-radius:0}.Dlj8CW_filterRow{cursor:pointer;border-radius:7px;grid-template-columns:auto minmax(0,1fr);align-items:start;gap:8px;min-width:0;padding:7px 8px;display:grid}.Dlj8CW_filterRow:hover,.Dlj8CW_filterSelected{background:var(--jira-accent-soft)}.Dlj8CW_filterRow input{accent-color:var(--jira-accent);margin-top:3px}.Dlj8CW_filterRow strong,.Dlj8CW_filterRow small,.Dlj8CW_choiceRow strong,.Dlj8CW_choiceRow small{text-overflow:ellipsis;white-space:nowrap;min-width:0;display:block;overflow:hidden}.Dlj8CW_filterRow strong,.Dlj8CW_choiceRow strong{color:var(--dsw-alias-label-primary);font-size:11px;font-weight:600}.Dlj8CW_filterRow small,.Dlj8CW_choiceRow small{color:var(--dsw-alias-label-tertiary);margin-top:2px;font-size:10px}.Dlj8CW_templateGrid{align-items:stretch}.Dlj8CW_templateMode{grid-template-columns:repeat(2,minmax(0,1fr))}.Dlj8CW_templatePreview{border:0;border-left:2px solid color-mix(in srgb, var(--panel-accent) 68%, transparent);background:color-mix(in srgb, var(--dsw-alias-bg-layer-3) 62%, transparent);min-height:170px;max-height:170px;color:var(--dsw-alias-label-secondary);white-space:pre-wrap;-webkit-line-clamp:6;border-radius:0;-webkit-box-orient:vertical;margin:0;padding:12px 13px 12px 14px;font-size:11px;line-height:1.55;display:-webkit-box;overflow:hidden}.Dlj8CW_bug .Dlj8CW_templatePreview{border-left-color:color-mix(in srgb, var(--jira-bug) 68%, transparent)}.Dlj8CW_templateTextarea{border:0;border-left:2px solid color-mix(in srgb, var(--panel-accent) 68%, transparent);background:color-mix(in srgb, var(--dsw-alias-bg-layer-3) 62%, transparent);border-radius:0;min-height:170px;max-height:170px;margin:0}.Dlj8CW_skillRule{border-left:0;margin-top:0;padding:14px 2px 0}.Dlj8CW_templatePanel>.Dlj8CW_pickerField{border-top:1px solid color-mix(in srgb, var(--dsw-alias-border-l2) 72%, transparent);grid-template-columns:96px minmax(0,1fr);align-items:center;gap:12px;margin-top:12px;padding-top:12px;display:grid}.Dlj8CW_templatePanel>.Dlj8CW_pickerField .Dlj8CW_choiceTrigger{border-color:color-mix(in srgb, var(--panel-accent) 22%, var(--dsw-alias-border-l2));background:color-mix(in srgb, var(--panel-accent) 5%, var(--dsw-alias-bg-layer-3));min-height:38px;box-shadow:0 1px 2px #1018280a}.Dlj8CW_templatePanel>.Dlj8CW_pickerField .Dlj8CW_choiceTrigger:hover,.Dlj8CW_templatePanel>.Dlj8CW_pickerField .Dlj8CW_choiceTriggerOpen{border-color:color-mix(in srgb, var(--panel-accent) 44%, var(--dsw-alias-border-l2));background:color-mix(in srgb, var(--panel-accent) 8%, var(--dsw-alias-bg-layer-3))}.Dlj8CW_choicePicker{gap:6px;display:grid;position:relative}.Dlj8CW_choiceTrigger{appearance:none;border:1px solid color-mix(in srgb, var(--dsw-alias-border-l2) 86%, transparent);background:var(--dsw-alias-bg-layer-3);width:100%;min-height:44px;color:var(--dsw-alias-label-primary);cursor:pointer;font:inherit;text-align:left;border-radius:4px;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;padding:7px 8px 7px 12px;transition:border-color .14s,background .14s,box-shadow .14s;display:grid;box-shadow:0 1px 2px #1018280a}.Dlj8CW_choiceTrigger:hover,.Dlj8CW_choiceTriggerOpen{border-color:color-mix(in srgb, var(--jira-accent) 43%, var(--dsw-alias-border-l2));background:var(--dsw-alias-bg-layer-3);box-shadow:0 0 0 3px color-mix(in srgb, var(--jira-accent) 7%, transparent)}.Dlj8CW_choiceTrigger strong,.Dlj8CW_choiceTrigger small{text-overflow:ellipsis;white-space:nowrap;display:block;overflow:hidden}.Dlj8CW_choiceTrigger strong{font-size:12px;font-weight:620}.Dlj8CW_choiceTrigger small{color:var(--dsw-alias-label-tertiary);margin-top:1px;font-size:9px}.Dlj8CW_choiceAffordance{flex:none;align-items:center;gap:7px;display:inline-flex}.Dlj8CW_choiceAction{color:var(--jira-accent);white-space:nowrap;font-size:10px;font-weight:650}.Dlj8CW_bug .Dlj8CW_choiceAction{color:var(--jira-bug)}.Dlj8CW_choiceChevron{background:color-mix(in srgb, var(--jira-accent) 7%, var(--dsw-alias-bg-layer-2));border-radius:4px;place-items:center;width:26px;height:26px;transition:background .14s,transform .14s;display:grid;position:relative}.Dlj8CW_choiceChevron:before{border-right:1.5px solid var(--dsw-alias-label-secondary);border-bottom:1.5px solid var(--dsw-alias-label-secondary);content:"";width:6px;height:6px;transform:translateY(-2px)rotate(45deg)}.Dlj8CW_choiceTriggerOpen .Dlj8CW_choiceChevron{background:color-mix(in srgb, var(--jira-accent) 13%, var(--dsw-alias-bg-layer-2));transform:rotate(180deg)}.Dlj8CW_choiceTriggerOpen .Dlj8CW_choiceChevron:before{border-color:var(--jira-accent)}.Dlj8CW_choicePanel{z-index:40;border:1px solid var(--dsw-alias-border-l2);background:var(--dsw-alias-bg-layer-3);border-radius:6px;gap:5px;padding:7px;display:grid;position:absolute;top:calc(100% + 6px);left:0;right:0;box-shadow:0 14px 34px #10182824}.Dlj8CW_choicePicker:has(.Dlj8CW_choiceTriggerOpen){z-index:40}.Dlj8CW_choiceRow{appearance:none;color:#0000;cursor:pointer;width:100%;min-height:42px;font:inherit;text-align:left;background:0 0;border:1px solid #0000;border-radius:4px;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;padding:6px 8px;display:grid}.Dlj8CW_choiceRow:hover{background:var(--dsw-alias-bg-layer-2)}.Dlj8CW_choiceSelected{border-color:color-mix(in srgb, var(--jira-accent) 24%, transparent);background:var(--jira-accent-soft);color:var(--jira-accent)}.Dlj8CW_emptyList{color:var(--dsw-alias-label-tertiary);text-align:center;padding:18px 8px;font-size:11px}.Dlj8CW_imageSettings{border-top:1px solid color-mix(in srgb, var(--dsw-alias-border-l2) 78%, transparent);max-width:980px;display:grid}.Dlj8CW_imageRouteField,.Dlj8CW_ocrToggle{border-bottom:1px solid color-mix(in srgb, var(--dsw-alias-border-l2) 72%, transparent);grid-template-columns:minmax(220px,.72fr) minmax(300px,1.28fr);align-items:center;gap:28px;padding:18px 2px;display:grid}.Dlj8CW_imageRouteField>div>strong,.Dlj8CW_ocrToggle strong{color:var(--dsw-alias-label-primary);font-size:12px;font-weight:650;display:block}.Dlj8CW_imageRouteField>div>p,.Dlj8CW_ocrToggle small{color:var(--dsw-alias-label-tertiary);margin:4px 0 0;font-size:10px;line-height:1.45;display:block}.Dlj8CW_ocrToggle{cursor:pointer}.Dlj8CW_ocrToggle input{width:16px;height:16px;accent-color:var(--jira-accent);grid-area:1/2;justify-self:end}.Dlj8CW_ocrToggle span{grid-area:1/1}.Dlj8CW_imageStrategy{color:var(--dsw-alias-label-secondary);counter-reset:image-strategy;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;margin:18px 0 0;padding:0;list-style:none;display:grid}.Dlj8CW_imageStrategy li{counter-increment:image-strategy;min-width:0;padding:31px 14px 4px 0;font-size:10px;line-height:1.55;position:relative}.Dlj8CW_imageStrategy li:before{border:1px solid color-mix(in srgb, var(--jira-accent) 36%, var(--dsw-alias-border-l2));background:color-mix(in srgb, var(--jira-accent) 7%, var(--dsw-alias-bg-layer-3));width:22px;height:22px;color:var(--jira-accent);content:counter(image-strategy);border-radius:50%;place-items:center;font-size:10px;font-weight:700;display:grid;position:absolute;top:0;left:0}.Dlj8CW_imageStrategy li:not(:last-child):after{background:color-mix(in srgb, var(--jira-accent) 24%, var(--dsw-alias-border-l2));content:"";height:1px;position:absolute;top:11px;left:29px;right:10px}.Dlj8CW_footer{border-top:1px solid var(--dsw-alias-border-l2);background:color-mix(in srgb, var(--dsw-alias-bg-layer-2) 42%, var(--dsw-alias-bg-layer-3));justify-content:flex-end;align-items:center;gap:8px;padding:12px 18px;display:flex}.Dlj8CW_failed,.Dlj8CW_saveHint{flex:1;min-width:0}.Dlj8CW_save{background:var(--jira-accent);color:#fff}.Dlj8CW_save:hover:not(:disabled){background:color-mix(in srgb, var(--jira-accent) 88%, #000)}.Dlj8CW_refresh:disabled,.Dlj8CW_discard:disabled,.Dlj8CW_save:disabled{opacity:.42;cursor:default}@container Dlj8CW_jira-settings-content (width<=720px){.Dlj8CW_connectionGrid,.Dlj8CW_sourceGrid,.Dlj8CW_templateGrid{grid-template-columns:1fr}.Dlj8CW_sourcePanel,.Dlj8CW_templatePanel{padding:0}.Dlj8CW_sourcePanel+.Dlj8CW_sourcePanel,.Dlj8CW_templatePanel+.Dlj8CW_templatePanel{border-top:1px solid color-mix(in srgb, var(--dsw-alias-border-l2) 82%, transparent);border-left:0;margin-top:24px;padding-top:24px;padding-left:0}.Dlj8CW_sourceToolbar{flex-direction:column;align-items:stretch}.Dlj8CW_sourceToolbar .Dlj8CW_pickerField{width:100%}.Dlj8CW_refresh{align-self:flex-start}.Dlj8CW_imageRouteField,.Dlj8CW_ocrToggle{grid-template-columns:1fr;gap:10px}.Dlj8CW_ocrToggle input,.Dlj8CW_ocrToggle span{grid-column:1}.Dlj8CW_ocrToggle input{grid-row:2;justify-self:start}.Dlj8CW_ocrToggle span{grid-row:1}.Dlj8CW_imageStrategy{grid-template-columns:1fr 1fr;row-gap:14px}}@media (width<=760px){.Dlj8CW_workspaceCard .Dlj8CW_body{grid-template-rows:auto minmax(0,1fr) auto;grid-template-columns:1fr}.Dlj8CW_workspaceCard .Dlj8CW_settingsNav{grid-area:1/1}.Dlj8CW_workspaceCard .Dlj8CW_settingsContent{grid-area:2/1}.Dlj8CW_workspaceCard .Dlj8CW_footer{grid-area:3/1}.Dlj8CW_settingsNav{border-right:0;border-bottom:1px solid var(--dsw-alias-border-l2);flex-direction:row;padding:9px 12px;overflow-x:auto}.Dlj8CW_settingsNavItem{min-width:145px;padding-left:10px}.Dlj8CW_settingsNavItem:before{width:auto;height:2px;inset:auto 10px 0}.Dlj8CW_connectionGrid,.Dlj8CW_sourceGrid,.Dlj8CW_templateGrid{grid-template-columns:1fr}.Dlj8CW_sourcePanel,.Dlj8CW_templatePanel{padding:0}.Dlj8CW_sourcePanel+.Dlj8CW_sourcePanel,.Dlj8CW_templatePanel+.Dlj8CW_templatePanel{border-top:1px solid color-mix(in srgb, var(--dsw-alias-border-l2) 82%, transparent);border-left:0;margin-top:24px;padding-top:24px;padding-left:0}.Dlj8CW_sourceToolbar{flex-direction:column;align-items:stretch}.Dlj8CW_sourceToolbar .Dlj8CW_pickerField{width:100%}.Dlj8CW_refresh{align-self:flex-start}.Dlj8CW_footer{flex-wrap:wrap;align-items:stretch}.Dlj8CW_pluginCard .Dlj8CW_footer{grid-template-columns:1fr auto auto}.Dlj8CW_failed,.Dlj8CW_saveHint{flex-basis:100%;width:100%}}@media (prefers-reduced-motion:reduce){.Dlj8CW_refreshIconBusy{animation:none}}';
 var tagId = "@jira-workbench/dsh-client/JiraConfigCard.module.css";
@@ -67,7 +64,6 @@ function JiraConfigCard(props) {
   const { t } = props;
   const state = props.useJiraConfigCard((snapshot2) => snapshot2);
   const standalone = props.standalone === true;
-  const [open, setOpen] = (0, import_react.useState)(standalone);
   const [section, setSection] = (0, import_react.useState)("connection");
   const settingsContentRef = (0, import_react.useRef)(null);
   const sectionRefs = (0, import_react.useRef)({
@@ -105,7 +101,6 @@ function JiraConfigCard(props) {
     setSection(next);
     content.scrollTo({ top, behavior: reduceMotion ? "auto" : "smooth" });
   };
-  const title = t("card.title");
   const blocked = !state.dirty || state.invalid || state.saving || state.loading;
   const projectChoices = state.projects.map((project) => ({
     value: project.key,
@@ -123,355 +118,333 @@ function JiraConfigCard(props) {
     label: state.imageProcessing.visionModel,
     meta: `${state.imageProcessing.visionProvider} \xB7 ${t("card.visionModelUnavailable")}`
   }, ...discoveredVisionChoices] : discoveredVisionChoices;
-  return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: clsx_default(
+  if (props.view === "summary" && !standalone) return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: t("card.pluginDescription") });
+  return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: clsx_default(
     JiraConfigCard_default.card,
-    open && JiraConfigCard_default.cardOpen,
+    JiraConfigCard_default.cardOpen,
     standalone ? JiraConfigCard_default.workspaceCard : JiraConfigCard_default.pluginCard
-  ), children: [
-    !standalone ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
-      "button",
-      {
-        type: "button",
-        className: JiraConfigCard_default.header,
-        "aria-expanded": open,
-        "aria-label": `${open ? "Collapse" : "Expand"}: ${title}`,
-        onClick: () => {
-          setOpen(!open);
-        },
-        children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: JiraConfigCard_default.brandMark, children: "JW" }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: JiraConfigCard_default.headText, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: JiraConfigCard_default.name, children: title }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: JiraConfigCard_default.description, children: t("card.pluginDescription") })
-          ] }),
-          state.dirty ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: JiraConfigCard_default.pending, children: t("card.unsaved") }) : null,
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)(import_dsh_client_ui_primitives.IconChevronDownOutline14, { className: clsx_default(JiraConfigCard_default.chevron, open && JiraConfigCard_default.chevronOpen) })
-        ]
-      }
-    ) : null,
-    open || standalone ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: JiraConfigCard_default.body, children: [
-      standalone ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("nav", { className: JiraConfigCard_default.settingsNav, "aria-label": t("card.settingsGroups"), children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
-          SettingsNavItem,
-          {
-            active: section === "connection",
-            target: "jira-settings-connection",
-            title: t("card.connection"),
-            copy: t("card.connectionNavHint"),
-            onClick: () => {
-              scrollToSection("connection");
-            }
+  ), children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: JiraConfigCard_default.body, children: [
+    standalone ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("nav", { className: JiraConfigCard_default.settingsNav, "aria-label": t("card.settingsGroups"), children: [
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+        SettingsNavItem,
+        {
+          active: section === "connection",
+          target: "jira-settings-connection",
+          title: t("card.connection"),
+          copy: t("card.connectionNavHint"),
+          onClick: () => {
+            scrollToSection("connection");
           }
-        ),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
-          SettingsNavItem,
-          {
-            active: section === "templates",
-            target: "jira-settings-templates",
-            title: t("card.templatesNav"),
-            copy: t("card.templatesNavHint"),
-            onClick: () => {
-              scrollToSection("templates");
-            }
+        }
+      ),
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+        SettingsNavItem,
+        {
+          active: section === "templates",
+          target: "jira-settings-templates",
+          title: t("card.templatesNav"),
+          copy: t("card.templatesNavHint"),
+          onClick: () => {
+            scrollToSection("templates");
           }
-        ),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
-          SettingsNavItem,
-          {
-            active: section === "images",
-            target: "jira-settings-images",
-            title: t("card.imagesNav"),
-            copy: t("card.imagesNavHint"),
-            onClick: () => {
-              scrollToSection("images");
-            }
+        }
+      ),
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+        SettingsNavItem,
+        {
+          active: section === "images",
+          target: "jira-settings-images",
+          title: t("card.imagesNav"),
+          copy: t("card.imagesNavHint"),
+          onClick: () => {
+            scrollToSection("images");
           }
-        ),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
-          SettingsNavItem,
-          {
-            active: section === "sources",
-            target: "jira-settings-sources",
-            title: t("card.advancedNav"),
-            copy: t("card.advancedNavHint"),
-            onClick: () => {
-              scrollToSection("sources");
-            }
+        }
+      ),
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+        SettingsNavItem,
+        {
+          active: section === "sources",
+          target: "jira-settings-sources",
+          title: t("card.advancedNav"),
+          copy: t("card.advancedNavHint"),
+          onClick: () => {
+            scrollToSection("sources");
           }
-        )
-      ] }) : null,
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { ref: settingsContentRef, className: JiraConfigCard_default.settingsContent, children: [
-        state.loading ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: JiraConfigCard_default.loading, children: t("card.loading") }) : null,
-        !state.loading ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
-          "section",
-          {
-            id: "jira-settings-connection",
-            ref: (element) => {
-              sectionRefs.current.connection = element;
-            },
-            className: JiraConfigCard_default.section,
-            children: [
-              standalone ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SectionHeading, { title: t("card.connection"), copy: t("card.connectionHint") }) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: JiraConfigCard_default.pluginConnectionHead, children: [
+        }
+      )
+    ] }) : null,
+    /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { ref: settingsContentRef, className: JiraConfigCard_default.settingsContent, children: [
+      state.loading ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: JiraConfigCard_default.loading, children: t("card.loading") }) : null,
+      !state.loading ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
+        "section",
+        {
+          id: "jira-settings-connection",
+          ref: (element) => {
+            sectionRefs.current.connection = element;
+          },
+          className: JiraConfigCard_default.section,
+          children: [
+            standalone ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SectionHeading, { title: t("card.connection"), copy: t("card.connectionHint") }) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: JiraConfigCard_default.pluginConnectionHead, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", { children: t("card.connection") }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: t("card.connectionHint") })
+              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: clsx_default(JiraConfigCard_default.status, state.tokenConfigured && JiraConfigCard_default.statusOk), children: t(state.tokenConfigured ? "card.tokenConfigured" : "card.tokenUnconfigured") })
+            ] }),
+            !state.writable ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: JiraConfigCard_default.readOnly, role: "status", children: t("card.readOnly") }) : null,
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: JiraConfigCard_default.connectionGrid, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+                Field,
+                {
+                  id: "jira-config-base-url",
+                  label: t("card.baseUrl"),
+                  hint: t("card.baseUrlHint"),
+                  text: state.baseUrlText,
+                  invalid: state.baseUrlInvalid,
+                  invalidLabel: t("card.invalidUrl"),
+                  disabled: !state.writable,
+                  onEdit: (text2) => {
+                    props.edit("baseUrl", text2);
+                  }
+                }
+              ),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: JiraConfigCard_default.field, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: JiraConfigCard_default.labelRow, children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", { className: JiraConfigCard_default.label, htmlFor: "jira-config-token", children: t("card.token") }),
+                  standalone ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: clsx_default(JiraConfigCard_default.status, state.tokenConfigured && JiraConfigCard_default.statusOk), children: t(state.tokenConfigured ? "card.tokenConfigured" : "card.tokenUnconfigured") }) : null
+                ] }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+                  "input",
+                  {
+                    id: "jira-config-token",
+                    className: JiraConfigCard_default.input,
+                    type: "password",
+                    autoComplete: "off",
+                    value: state.tokenText,
+                    disabled: !state.writable || !state.tokenWritable,
+                    placeholder: state.tokenConfigured ? t("card.tokenKeep") : t("card.tokenRequired"),
+                    onChange: (event) => {
+                      props.edit("token", event.target.value);
+                    }
+                  }
+                ),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: JiraConfigCard_default.hint, children: t("card.tokenHint") })
+              ] })
+            ] }),
+            !standalone ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: JiraConfigCard_default.pluginSettingsNote, children: t("card.pluginSettingsHint") }) : null
+          ]
+        }
+      ) : null,
+      !state.loading && standalone ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
+        "section",
+        {
+          id: "jira-settings-templates",
+          ref: (element) => {
+            sectionRefs.current.templates = element;
+          },
+          className: JiraConfigCard_default.section,
+          children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SectionHeading, { title: t("card.templates"), copy: t("card.templatesHint") }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: JiraConfigCard_default.templateGrid, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+                TemplateEditor,
+                {
+                  kind: "requirement",
+                  title: t("card.requirementTemplate"),
+                  accent: "requirement",
+                  value: state.promptTemplates.requirement,
+                  skills: state.skills,
+                  onPatch: (patch) => {
+                    props.editTemplate("requirement", patch);
+                  }
+                }
+              ),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+                TemplateEditor,
+                {
+                  kind: "bug",
+                  title: t("card.bugTemplate"),
+                  accent: "bug",
+                  value: state.promptTemplates.bug,
+                  skills: state.skills,
+                  onPatch: (patch) => {
+                    props.editTemplate("bug", patch);
+                  }
+                }
+              )
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: JiraConfigCard_default.skillRule, children: t("card.skillRule") })
+          ]
+        }
+      ) : null,
+      !state.loading && standalone ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
+        "section",
+        {
+          id: "jira-settings-images",
+          ref: (element) => {
+            sectionRefs.current.images = element;
+          },
+          className: JiraConfigCard_default.section,
+          children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SectionHeading, { title: t("card.images"), copy: t("card.imagesHint") }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: JiraConfigCard_default.imageSettings, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: JiraConfigCard_default.imageRouteField, children: [
                 /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", { children: t("card.connection") }),
-                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: t("card.connectionHint") })
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: t("card.visionModel") }),
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: t("card.visionModelHint") })
                 ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: clsx_default(JiraConfigCard_default.status, state.tokenConfigured && JiraConfigCard_default.statusOk), children: t(state.tokenConfigured ? "card.tokenConfigured" : "card.tokenUnconfigured") })
-              ] }),
-              !state.writable ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: JiraConfigCard_default.readOnly, role: "status", children: t("card.readOnly") }) : null,
-              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: JiraConfigCard_default.connectionGrid, children: [
                 /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
-                  Field,
+                  ChoicePicker,
                   {
-                    id: "jira-config-base-url",
-                    label: t("card.baseUrl"),
-                    hint: t("card.baseUrlHint"),
-                    text: state.baseUrlText,
-                    invalid: state.baseUrlInvalid,
-                    invalidLabel: t("card.invalidUrl"),
-                    disabled: !state.writable,
-                    onEdit: (text2) => {
-                      props.edit("baseUrl", text2);
+                    id: "jira-vision-model",
+                    value: selectedVision,
+                    options: visionChoices,
+                    placeholder: t("card.visionModelNone"),
+                    searchPlaceholder: t("card.visionModelSearch"),
+                    emptyText: t("card.visionModelEmpty"),
+                    clearable: true,
+                    actionLabel: selectedVision ? t("card.visionModelChange") : t("card.visionModelChoose"),
+                    onChange: (value) => {
+                      const selected = state.visionModels.find((model) => `${model.provider}\0${model.id}` === value);
+                      props.editImageProcessing({
+                        visionProvider: selected?.provider || "",
+                        visionModel: selected?.id || ""
+                      });
+                    }
+                  }
+                )
+              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("label", { className: JiraConfigCard_default.ocrToggle, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+                  "input",
+                  {
+                    type: "checkbox",
+                    checked: state.imageProcessing.localOcrEnabled,
+                    onChange: (event) => {
+                      props.editImageProcessing({ localOcrEnabled: event.target.checked });
                     }
                   }
                 ),
-                /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: JiraConfigCard_default.field, children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: JiraConfigCard_default.labelRow, children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", { className: JiraConfigCard_default.label, htmlFor: "jira-config-token", children: t("card.token") }),
-                    standalone ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: clsx_default(JiraConfigCard_default.status, state.tokenConfigured && JiraConfigCard_default.statusOk), children: t(state.tokenConfigured ? "card.tokenConfigured" : "card.tokenUnconfigured") }) : null
-                  ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
-                    "input",
-                    {
-                      id: "jira-config-token",
-                      className: JiraConfigCard_default.input,
-                      type: "password",
-                      autoComplete: "off",
-                      value: state.tokenText,
-                      disabled: !state.writable || !state.tokenWritable,
-                      placeholder: state.tokenConfigured ? t("card.tokenKeep") : t("card.tokenRequired"),
-                      onChange: (event) => {
-                        props.edit("token", event.target.value);
-                      }
-                    }
-                  ),
-                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: JiraConfigCard_default.hint, children: t("card.tokenHint") })
+                /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: t("card.localOcr") }),
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("small", { children: t("card.localOcrHint") })
                 ] })
               ] }),
-              !standalone ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: JiraConfigCard_default.pluginSettingsNote, children: t("card.pluginSettingsHint") }) : null
-            ]
-          }
-        ) : null,
-        !state.loading && standalone ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
-          "section",
-          {
-            id: "jira-settings-templates",
-            ref: (element) => {
-              sectionRefs.current.templates = element;
-            },
-            className: JiraConfigCard_default.section,
-            children: [
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SectionHeading, { title: t("card.templates"), copy: t("card.templatesHint") }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: JiraConfigCard_default.templateGrid, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("ol", { className: JiraConfigCard_default.imageStrategy, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: t("card.imageStrategyNative") }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: t("card.imageStrategyVision") }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: t("card.imageStrategyOcr") }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: t("card.imageStrategyUnparsed") })
+              ] })
+            ] })
+          ]
+        }
+      ) : null,
+      !state.loading && standalone ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
+        "section",
+        {
+          id: "jira-settings-sources",
+          ref: (element) => {
+            sectionRefs.current.sources = element;
+          },
+          className: JiraConfigCard_default.section,
+          children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SectionHeading, { title: t("card.sources"), copy: t("card.sourcesHint") }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: JiraConfigCard_default.sourceToolbar, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: JiraConfigCard_default.pickerField, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: JiraConfigCard_default.label, children: t("card.projectKey") }),
                 /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
-                  TemplateEditor,
+                  ChoicePicker,
                   {
-                    kind: "requirement",
-                    title: t("card.requirementTemplate"),
-                    accent: "requirement",
-                    value: state.promptTemplates.requirement,
-                    skills: state.skills,
-                    onPatch: (patch) => {
-                      props.editTemplate("requirement", patch);
-                    }
-                  }
-                ),
-                /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
-                  TemplateEditor,
-                  {
-                    kind: "bug",
-                    title: t("card.bugTemplate"),
-                    accent: "bug",
-                    value: state.promptTemplates.bug,
-                    skills: state.skills,
-                    onPatch: (patch) => {
-                      props.editTemplate("bug", patch);
-                    }
+                    id: "jira-project-picker",
+                    value: state.boardSources.projectKey,
+                    options: projectChoices,
+                    placeholder: t("card.projectPlaceholder"),
+                    searchPlaceholder: t("card.searchProject"),
+                    emptyText: t("card.noProjects"),
+                    allowCustom: true,
+                    onChange: props.editProjectKey
                   }
                 )
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: JiraConfigCard_default.skillRule, children: t("card.skillRule") })
-            ]
-          }
-        ) : null,
-        !state.loading && standalone ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
-          "section",
-          {
-            id: "jira-settings-images",
-            ref: (element) => {
-              sectionRefs.current.images = element;
-            },
-            className: JiraConfigCard_default.section,
-            children: [
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SectionHeading, { title: t("card.images"), copy: t("card.imagesHint") }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: JiraConfigCard_default.imageSettings, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: JiraConfigCard_default.imageRouteField, children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: t("card.visionModel") }),
-                    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: t("card.visionModelHint") })
-                  ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
-                    ChoicePicker,
-                    {
-                      id: "jira-vision-model",
-                      value: selectedVision,
-                      options: visionChoices,
-                      placeholder: t("card.visionModelNone"),
-                      searchPlaceholder: t("card.visionModelSearch"),
-                      emptyText: t("card.visionModelEmpty"),
-                      clearable: true,
-                      actionLabel: selectedVision ? t("card.visionModelChange") : t("card.visionModelChoose"),
-                      onChange: (value) => {
-                        const selected = state.visionModels.find((model) => `${model.provider}\0${model.id}` === value);
-                        props.editImageProcessing({
-                          visionProvider: selected?.provider || "",
-                          visionModel: selected?.id || ""
-                        });
-                      }
-                    }
-                  )
-                ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("label", { className: JiraConfigCard_default.ocrToggle, children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
-                    "input",
-                    {
-                      type: "checkbox",
-                      checked: state.imageProcessing.localOcrEnabled,
-                      onChange: (event) => {
-                        props.editImageProcessing({ localOcrEnabled: event.target.checked });
-                      }
-                    }
-                  ),
-                  /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: t("card.localOcr") }),
-                    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("small", { children: t("card.localOcrHint") })
-                  ] })
-                ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("ol", { className: JiraConfigCard_default.imageStrategy, children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: t("card.imageStrategyNative") }),
-                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: t("card.imageStrategyVision") }),
-                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: t("card.imageStrategyOcr") }),
-                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: t("card.imageStrategyUnparsed") })
-                ] })
-              ] })
-            ]
-          }
-        ) : null,
-        !state.loading && standalone ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
-          "section",
-          {
-            id: "jira-settings-sources",
-            ref: (element) => {
-              sectionRefs.current.sources = element;
-            },
-            className: JiraConfigCard_default.section,
-            children: [
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SectionHeading, { title: t("card.sources"), copy: t("card.sourcesHint") }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: JiraConfigCard_default.sourceToolbar, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: JiraConfigCard_default.pickerField, children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: JiraConfigCard_default.label, children: t("card.projectKey") }),
-                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
-                    ChoicePicker,
-                    {
-                      id: "jira-project-picker",
-                      value: state.boardSources.projectKey,
-                      options: projectChoices,
-                      placeholder: t("card.projectPlaceholder"),
-                      searchPlaceholder: t("card.searchProject"),
-                      emptyText: t("card.noProjects"),
-                      allowCustom: true,
-                      onChange: props.editProjectKey
-                    }
-                  )
-                ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
-                  "button",
-                  {
-                    type: "button",
-                    className: JiraConfigCard_default.refresh,
-                    disabled: state.optionsLoading,
-                    onClick: props.refreshOptions,
-                    children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: clsx_default(JiraConfigCard_default.refreshIcon, state.optionsLoading && JiraConfigCard_default.refreshIconBusy), "aria-hidden": "true", children: "\u21BB" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: t(state.optionsLoading ? "card.refreshing" : "card.refreshOptions") })
-                    ]
+              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
+                "button",
+                {
+                  type: "button",
+                  className: JiraConfigCard_default.refresh,
+                  disabled: state.optionsLoading,
+                  onClick: props.refreshOptions,
+                  children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: clsx_default(JiraConfigCard_default.refreshIcon, state.optionsLoading && JiraConfigCard_default.refreshIconBusy), "aria-hidden": "true", children: "\u21BB" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: t(state.optionsLoading ? "card.refreshing" : "card.refreshOptions") })
+                  ]
+                }
+              )
+            ] }),
+            state.optionsMessage ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: JiraConfigCard_default.optionMessage, children: state.optionsMessage }) : null,
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: JiraConfigCard_default.sourceGrid, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+                SourceEditor,
+                {
+                  kind: "requirement",
+                  title: t("card.requirementSource"),
+                  accent: "requirement",
+                  source: state.boardSources.requirement,
+                  filters: state.filters,
+                  onPatch: (patch) => {
+                    props.editBoardSource("requirement", patch);
+                  },
+                  onToggleFilter: (filterId) => {
+                    props.toggleFilter("requirement", filterId);
                   }
-                )
-              ] }),
-              state.optionsMessage ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: JiraConfigCard_default.optionMessage, children: state.optionsMessage }) : null,
-              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: JiraConfigCard_default.sourceGrid, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
-                  SourceEditor,
-                  {
-                    kind: "requirement",
-                    title: t("card.requirementSource"),
-                    accent: "requirement",
-                    source: state.boardSources.requirement,
-                    filters: state.filters,
-                    onPatch: (patch) => {
-                      props.editBoardSource("requirement", patch);
-                    },
-                    onToggleFilter: (filterId) => {
-                      props.toggleFilter("requirement", filterId);
-                    }
+                }
+              ),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+                SourceEditor,
+                {
+                  kind: "bug",
+                  title: t("card.bugSource"),
+                  accent: "bug",
+                  source: state.boardSources.bug,
+                  filters: state.filters,
+                  onPatch: (patch) => {
+                    props.editBoardSource("bug", patch);
+                  },
+                  onToggleFilter: (filterId) => {
+                    props.toggleFilter("bug", filterId);
                   }
-                ),
-                /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
-                  SourceEditor,
-                  {
-                    kind: "bug",
-                    title: t("card.bugSource"),
-                    accent: "bug",
-                    source: state.boardSources.bug,
-                    filters: state.filters,
-                    onPatch: (patch) => {
-                      props.editBoardSource("bug", patch);
-                    },
-                    onToggleFilter: (filterId) => {
-                      props.toggleFilter("bug", filterId);
-                    }
-                  }
-                )
-              ] })
-            ]
-          }
-        ) : null
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: JiraConfigCard_default.footer, children: [
-        state.failed ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: JiraConfigCard_default.failed, role: "status", children: state.failureMessage || t("card.saveFailed") }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: JiraConfigCard_default.saveHint, children: t(standalone ? "card.saveHint" : "card.connectionSaveHint") }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
-          "button",
-          {
-            type: "button",
-            className: JiraConfigCard_default.discard,
-            disabled: !state.dirty || state.saving,
-            onClick: props.discard,
-            children: t("card.discard")
-          }
-        ),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
-          "button",
-          {
-            type: "button",
-            className: JiraConfigCard_default.save,
-            disabled: blocked,
-            onClick: props.save,
-            children: t(state.saving ? "card.saving" : "card.save")
-          }
-        )
-      ] })
-    ] }) : null
-  ] });
+                }
+              )
+            ] })
+          ]
+        }
+      ) : null
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: JiraConfigCard_default.footer, children: [
+      state.failed ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: JiraConfigCard_default.failed, role: "status", children: state.failureMessage || t("card.saveFailed") }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: JiraConfigCard_default.saveHint, children: t(standalone ? "card.saveHint" : "card.connectionSaveHint") }),
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+        "button",
+        {
+          type: "button",
+          className: JiraConfigCard_default.discard,
+          disabled: !state.dirty || state.saving,
+          onClick: props.discard,
+          children: t("card.discard")
+        }
+      ),
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+        "button",
+        {
+          type: "button",
+          className: JiraConfigCard_default.save,
+          disabled: blocked,
+          onClick: props.save,
+          children: t(state.saving ? "card.saving" : "card.save")
+        }
+      )
+    ] })
+  ] }) });
 }
 function SettingsNavItem(props) {
   return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
@@ -821,7 +794,7 @@ function ChoicePicker(props) {
 
 // src/client/JiraPanel.tsx
 var import_react2 = require("react");
-var import_dsh_client_ui_primitives2 = require("@deepseek-ai/dsh-client-ui-primitives");
+var import_dsh_client_ui_primitives = require("@deepseek-ai/dsh-client-ui-primitives");
 
 // src/client/jira-workspace-store.ts
 var snapshot = {
@@ -894,7 +867,7 @@ function JiraPanel(props) {
         jiraWorkspaceStore.toggleBoard();
       },
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(import_dsh_client_ui_primitives2.IconChecklistOutline14, {}),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(import_dsh_client_ui_primitives.IconChecklistOutlineMedium, { size: 14 }),
         wide && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: JiraPanel_default.label, children: t("panel.trigger") })
       ]
     }
@@ -903,7 +876,7 @@ function JiraPanel(props) {
 
 // src/client/JiraSessionContext.tsx
 var import_react3 = require("react");
-var import_dsh_client_ui_primitives3 = require("@deepseek-ai/dsh-client-ui-primitives");
+var import_dsh_client_ui_primitives2 = require("@deepseek-ai/dsh-client-ui-primitives");
 
 // src/client/JiraSessionContext.module.css
 var css3 = ".pzTNzW_root{display:inline-flex;position:relative}.pzTNzW_trigger{background:var(--dsw-alias-bg-layer-2);max-width:min(360px,34vw);min-height:28px;color:var(--dsw-alias-label-secondary);font:inherit;cursor:pointer;border:1px solid #0000;border-radius:6px;align-items:center;gap:6px;padding:3px 7px;font-size:12px;line-height:18px;display:inline-flex}.pzTNzW_trigger:hover,.pzTNzW_trigger:focus-visible,.pzTNzW_trigger[aria-expanded=true]{background:var(--dsw-alias-interactive-bg-hover);color:var(--dsw-alias-label-primary);border-color:#0000}.pzTNzW_trigger:focus-visible,.pzTNzW_quietButton:focus-visible,.pzTNzW_iconButton:focus-visible,.pzTNzW_secondaryButton:focus-visible,.pzTNzW_primaryButton:focus-visible,.pzTNzW_dangerButton:focus-visible,.pzTNzW_confirmButton:focus-visible,.pzTNzW_moreDanger:focus-visible,.pzTNzW_link:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:2px}.pzTNzW_triggerError{color:var(--dsw-alias-state-warn-primary)}.pzTNzW_triggerLabel{font-family:var(--dsw-font-mono);font-weight:600}.pzTNzW_triggerTypeBug,.pzTNzW_triggerTypeRequirement{border-radius:4px;flex:none;justify-content:center;align-items:center;width:18px;height:18px;font-size:10px;font-weight:650;line-height:1;display:inline-flex}.pzTNzW_triggerTypeBug{background:var(--dsw-alias-interactive-bg-hover-danger);color:var(--dsw-alias-state-error-primary)}.pzTNzW_triggerTypeRequirement{background:var(--dsw-alias-button-info-fill);color:var(--dsw-alias-brand-primary)}.pzTNzW_triggerStatus{min-width:0;color:var(--dsw-alias-label-tertiary);white-space:nowrap;text-overflow:ellipsis;font-size:11px;overflow:hidden}.pzTNzW_triggerChevron,.pzTNzW_triggerChevronOpen{color:var(--dsw-alias-label-tertiary);flex:none;transition:transform .14s}.pzTNzW_triggerChevronOpen{transform:rotate(180deg)}.pzTNzW_popover{z-index:120;box-sizing:border-box;transform-origin:100% 0;border:1px solid var(--dsw-alias-border-l2);background:var(--dsw-specific-menu);width:410px;max-width:min(440px,100vw - 32px);height:clamp(440px,76vh,560px);min-height:0;max-height:calc(100vh - 88px);color:var(--dsw-alias-label-primary);box-shadow:var(--dsw-shadow-lv3);border-radius:10px;grid-template-rows:auto minmax(0,1fr) auto auto;padding:0;display:grid;position:fixed;top:56px;right:28px;overflow:hidden}.pzTNzW_header,.pzTNzW_identity,.pzTNzW_headerActions,.pzTNzW_meta,.pzTNzW_footer,.pzTNzW_workspace,.pzTNzW_parentContext,.pzTNzW_confirmation,.pzTNzW_confirmation>div{align-items:center;display:flex}.pzTNzW_header{border-bottom:1px solid var(--dsw-alias-border-l2);justify-content:space-between;gap:12px;padding:12px 14px}.pzTNzW_identity{gap:8px;min-width:0;font-size:12px;line-height:18px}.pzTNzW_identity strong{font-family:var(--dsw-font-mono);font-weight:600}.pzTNzW_typeBug,.pzTNzW_typeRequirement{border-radius:6px;justify-content:center;align-items:center;width:20px;height:20px;font-size:11px;font-weight:600;line-height:1;display:inline-flex}.pzTNzW_typeBug{background:var(--dsw-alias-interactive-bg-hover-danger);color:var(--dsw-alias-state-error-primary)}.pzTNzW_typeRequirement{background:var(--dsw-alias-button-info-fill);color:var(--dsw-alias-brand-primary)}.pzTNzW_status{background:var(--dsw-alias-fill-l2);max-width:120px;color:var(--dsw-alias-label-secondary);white-space:nowrap;text-overflow:ellipsis;border-radius:999px;padding:1px 7px;overflow:hidden}.pzTNzW_headerActions{flex:none;gap:4px}.pzTNzW_body{scrollbar-gutter:stable;min-height:0;padding:16px;overflow:auto}.pzTNzW_moreWrap{position:relative}.pzTNzW_moreMenu{z-index:2;border:1px solid var(--dsw-alias-border-l2);background:var(--dsw-specific-menu);min-width:132px;box-shadow:var(--dsw-shadow-lv2);border-radius:6px;padding:4px;position:absolute;top:calc(100% + 5px);right:0}.pzTNzW_moreDanger{width:100%;min-height:30px;color:var(--dsw-alias-state-error-primary);font:inherit;text-align:left;cursor:pointer;background:0 0;border:0;border-radius:4px;padding:5px 8px;font-size:12px}.pzTNzW_moreDanger:hover{background:var(--dsw-alias-interactive-bg-hover-danger)}.pzTNzW_quietButton,.pzTNzW_iconButton,.pzTNzW_secondaryButton,.pzTNzW_primaryButton,.pzTNzW_dangerButton,.pzTNzW_confirmButton{font:inherit;cursor:pointer;border:0;border-radius:8px}.pzTNzW_quietButton,.pzTNzW_iconButton{color:var(--dsw-alias-label-tertiary);background:0 0}.pzTNzW_quietButton{padding:4px 7px;font-size:12px;line-height:18px}.pzTNzW_quietButton:hover,.pzTNzW_iconButton:hover{background:var(--dsw-alias-interactive-bg-hover);color:var(--dsw-alias-label-primary)}.pzTNzW_iconButton{justify-content:center;align-items:center;width:28px;height:28px;display:inline-flex}.pzTNzW_issueTitle{margin:0 0 7px;font-size:15px;font-weight:600;line-height:22px}.pzTNzW_meta{color:var(--dsw-alias-label-tertiary);flex-wrap:wrap;gap:6px 12px;font-size:12px;line-height:18px}.pzTNzW_summary{color:var(--dsw-alias-label-secondary);white-space:pre-wrap;overflow-wrap:anywhere;margin:12px 0 0;font-size:13px;line-height:20px}.pzTNzW_workspace,.pzTNzW_parentContext{border-top:1px solid var(--dsw-alias-border-l2);min-width:0;color:var(--dsw-alias-label-tertiary);gap:8px;margin-top:12px;padding-top:10px;font-size:12px;line-height:18px}.pzTNzW_workspace strong,.pzTNzW_parentContext strong,.pzTNzW_parentContext span:last-child{min-width:0;color:var(--dsw-alias-label-secondary);white-space:nowrap;text-overflow:ellipsis;font-weight:500;overflow:hidden}.pzTNzW_parentContext span:last-child{flex:1}.pzTNzW_warning{background:var(--dsw-alias-state-warn-tertiary);color:var(--dsw-alias-state-warn-primary);border-radius:8px;margin:10px 0 0;padding:8px 10px;font-size:12px;line-height:18px}.pzTNzW_footer{border-top:1px solid var(--dsw-alias-border-l2);background:color-mix(in srgb, var(--dsw-alias-bg-layer-2) 54%, var(--dsw-specific-menu));flex-wrap:nowrap;gap:8px;margin:0;padding:12px 14px}.pzTNzW_secondaryButton,.pzTNzW_primaryButton,.pzTNzW_dangerButton,.pzTNzW_confirmButton,.pzTNzW_link{box-sizing:border-box;min-height:30px;padding:6px 10px;font-size:12px;line-height:18px;text-decoration:none}.pzTNzW_secondaryButton{background:var(--dsw-alias-button-info-fill);color:var(--dsw-alias-brand-primary);flex:1}.pzTNzW_secondaryButton:hover{background:var(--dsw-alias-interactive-bg-hover)}.pzTNzW_primaryButton,.pzTNzW_confirmButton{background:var(--dsw-alias-button-primary-fill);color:var(--dsw-alias-label-primary-inverted)}.pzTNzW_primaryButton{flex:1.2}.pzTNzW_primaryButton:hover,.pzTNzW_confirmButton:hover{background:var(--dsw-alias-button-primary-hover)}.pzTNzW_link{color:var(--dsw-alias-brand-primary);flex:none;align-items:center;display:inline-flex}.pzTNzW_link:hover{text-decoration:underline}.pzTNzW_dangerButton{color:var(--dsw-alias-state-error-primary);background:0 0;margin-left:auto}.pzTNzW_dangerButton:hover{background:var(--dsw-alias-interactive-bg-hover-danger)}.pzTNzW_confirmation{border-top:1px solid color-mix(in srgb, var(--dsw-alias-state-error-primary) 22%, var(--dsw-alias-border-l2));background:var(--dsw-alias-interactive-bg-hover-danger);color:var(--dsw-alias-state-error-primary);border-radius:0;justify-content:space-between;gap:12px;margin:0;padding:10px 14px;font-size:12px;line-height:18px}.pzTNzW_confirmation>div{flex:none;gap:4px}.pzTNzW_quietButton:disabled,.pzTNzW_dangerButton:disabled,.pzTNzW_confirmButton:disabled{opacity:.55;cursor:wait}@media (width<=720px){.pzTNzW_popover{width:auto;max-width:none;min-height:0;max-height:calc(100vh - 88px);position:fixed;top:56px;left:16px;right:16px}.pzTNzW_footer{flex-wrap:wrap}}@media (prefers-reduced-motion:no-preference){.pzTNzW_popover{animation:.15s ease-out pzTNzW_jira-context-enter}.pzTNzW_trigger,.pzTNzW_secondaryButton,.pzTNzW_primaryButton,.pzTNzW_dangerButton,.pzTNzW_iconButton{transition:background-color .12s,border-color .12s,color .12s}}@keyframes pzTNzW_jira-context-enter{0%{opacity:0;transform:translateY(-5px)scale(.98)}to{opacity:1;transform:translateY(0)scale(1)}}";
@@ -1054,10 +1027,10 @@ function JiraSessionContext({
           setConfirmUnlink(false);
         },
         children: [
-          context && issue ? /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: issue.type === "bug" ? JiraSessionContext_default.triggerTypeBug : JiraSessionContext_default.triggerTypeRequirement, children: issue.type === "bug" ? "B" : "R" }) : /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(import_dsh_client_ui_primitives3.StateDot, { state: loadError ? "warning" : "ongoing" }),
+          context && issue ? /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: issue.type === "bug" ? JiraSessionContext_default.triggerTypeBug : JiraSessionContext_default.triggerTypeRequirement, children: issue.type === "bug" ? "B" : "R" }) : /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(import_dsh_client_ui_primitives2.StateDot, { state: loadError ? "warning" : "ongoing" }),
           /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: JiraSessionContext_default.triggerLabel, children: context ? context.issueKey : t("context.errorShort") }),
           context && issue && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: JiraSessionContext_default.triggerStatus, children: issue.statusName }),
-          context && issue && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(import_dsh_client_ui_primitives3.IconChevronDownOutline14, { className: open ? JiraSessionContext_default.triggerChevronOpen : JiraSessionContext_default.triggerChevron })
+          context && issue && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(import_dsh_client_ui_primitives2.IconChevronDownOutlineMedium, { size: 14, className: open ? JiraSessionContext_default.triggerChevronOpen : JiraSessionContext_default.triggerChevron })
         ]
       }
     ),
@@ -1084,7 +1057,7 @@ function JiraSessionContext({
                   setMoreOpen((current) => !current);
                   setConfirmUnlink(false);
                 },
-                children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(import_dsh_client_ui_primitives3.IconEllipsisOutline16, { size: 16 })
+                children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(import_dsh_client_ui_primitives2.IconEllipsisOutlineMedium, { size: 16 })
               }
             ),
             moreOpen && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: JiraSessionContext_default.moreMenu, role: "menu", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
@@ -1112,7 +1085,7 @@ function JiraSessionContext({
                 setOpen(false);
                 triggerRef.current?.focus();
               },
-              children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(import_dsh_client_ui_primitives3.IconCloseOutline16, { size: 14 })
+              children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(import_dsh_client_ui_primitives2.IconCloseOutlineMedium, { size: 14 })
             }
           )
         ] })
@@ -1185,7 +1158,7 @@ function JiraSessionContext({
 
 // src/client/JiraWorkspaceSurface.tsx
 var import_react4 = require("react");
-var import_dsh_client_ui_primitives4 = require("@deepseek-ai/dsh-client-ui-primitives");
+var import_dsh_client_ui_primitives3 = require("@deepseek-ai/dsh-client-ui-primitives");
 
 // src/client/JiraWorkspaceSurface.module.css
 var css4 = ".M0OW-q_root{z-index:1;border-left:1px solid var(--dsw-alias-border-l1);background:var(--dsw-alias-bg-base);min-width:0;color:var(--dsw-alias-label-primary);pointer-events:auto;animation:M0OW-q_workspaceEnter .18s var(--ds-ease-out,ease-out);display:flex;position:absolute;inset:0;overflow:hidden}@keyframes M0OW-q_workspaceEnter{0%{opacity:.72;transform:translate(8px)}to{opacity:1;transform:translate(0)}}.M0OW-q_frame{background:var(--dsw-alias-bg-base);border:0;width:100%;min-width:0;height:100%}.M0OW-q_settingsRoot{flex-direction:column}.M0OW-q_frameLoading{z-index:2;background:var(--dsw-alias-bg-base);color:var(--dsw-alias-label-secondary);place-content:center;justify-items:center;gap:12px;font-size:13px;display:grid;position:absolute;inset:0}.M0OW-q_spinner{border:2px solid var(--dsw-alias-border-l2);border-top-color:#5272d2;border-radius:50%;width:22px;height:22px;animation:.8s linear infinite M0OW-q_spin}@keyframes M0OW-q_spin{to{transform:rotate(360deg)}}.M0OW-q_loadingClose,.M0OW-q_backButton,.M0OW-q_iconButton{background:var(--dsw-alias-bg-layer-2);min-height:34px;color:var(--dsw-alias-label-secondary);cursor:pointer;font:inherit;border:0;border-radius:8px;transition:background .14s,color .14s,box-shadow .14s,transform .14s}.M0OW-q_loadingClose{padding:0 13px;font-size:12px;font-weight:600}.M0OW-q_backButton{background:color-mix(in srgb, #5272d2 9%, var(--dsw-alias-bg-layer-3));color:#5272d2;align-items:center;gap:7px;padding:0 13px 0 8px;font-size:12px;font-weight:650;display:inline-flex;box-shadow:inset 0 0 0 1px #5272d226}.M0OW-q_backIcon{background:#5272d21a;border-radius:6px;place-items:center;width:21px;height:21px;font-size:14px;line-height:1;display:grid}.M0OW-q_loadingClose:hover,.M0OW-q_backButton:hover{background:color-mix(in srgb, #5272d2 14%, var(--dsw-alias-bg-layer-3));color:#5272d2}.M0OW-q_backButton:hover{transform:translateY(-1px);box-shadow:inset 0 0 0 1px #5272d23d}.M0OW-q_navigationError{z-index:3;background:color-mix(in srgb, #c8675d 13%, var(--dsw-alias-bg-layer-3));color:#c8675d;border-radius:8px;max-width:min(520px,100% - 36px);padding:10px 13px;font-size:12px;position:absolute;top:14px;right:18px;box-shadow:0 12px 28px #141b2724}.M0OW-q_settingsHeader{border-bottom:1px solid var(--dsw-alias-border-l2);background:var(--dsw-alias-bg-layer-3);flex:none;justify-content:space-between;align-items:center;gap:18px;min-height:72px;padding:0 24px;display:flex}.M0OW-q_settingsHeader h1{margin:2px 0 0;font-size:19px;line-height:1.3}.M0OW-q_eyebrow{color:#5272d2;letter-spacing:.08em;font-size:10px;font-weight:750}.M0OW-q_settingsActions{align-items:center;gap:8px;display:flex}.M0OW-q_iconButton{background:color-mix(in srgb, var(--dsw-alias-bg-layer-2) 72%, transparent);width:34px;box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--dsw-alias-border-l2) 72%, transparent);place-items:center;padding:0;display:grid}.M0OW-q_iconButton:hover{background:var(--dsw-alias-bg-layer-1);color:var(--dsw-alias-label-primary);box-shadow:inset 0 0 0 1px var(--dsw-alias-border-l2)}.M0OW-q_settingsBody{background:var(--dsw-alias-bg-base);flex:1;min-width:0;min-height:0;overflow:hidden}@media (prefers-reduced-motion:reduce){.M0OW-q_root,.M0OW-q_spinner{animation:none}}";
@@ -1370,7 +1343,7 @@ function JiraWorkspaceSurface(props) {
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { type: "button", className: JiraWorkspaceSurface_default.iconButton, "aria-label": props.t("panel.close"), onClick: () => {
             jiraWorkspaceStore.close();
-          }, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(import_dsh_client_ui_primitives4.IconCloseOutline16, { size: 16 }) })
+          }, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(import_dsh_client_ui_primitives3.IconCloseOutlineMedium, { size: 16 }) })
         ] })
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: JiraWorkspaceSurface_default.settingsBody, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(JiraConfigCard, { ...props, standalone: true }) })
@@ -1402,7 +1375,7 @@ function JiraWorkspaceSurface(props) {
 }
 
 // src/client/jira-config-card-controller.ts
-var import_client = require("@deepseek-ai/dsh-client-runtime/client");
+var import_dsh_client_store = require("@deepseek-ai/dsh-client-store");
 var JIRA_WORKBENCH_NS = "jira-workbench";
 var JIRA_WORKBENCH_TOKEN_REF = "JIRA_WORKBENCH_TOKEN";
 var EMPTY_BOARD_SOURCE = { mode: "builtin", jql: "", filterIds: [] };
@@ -1513,13 +1486,14 @@ function sameJson(left, right) {
   return JSON.stringify(left) === JSON.stringify(right);
 }
 var JiraConfigCardController = class {
-  constructor(scope, api, commitConfiguration = commitJiraConfiguration) {
+  constructor(scope, ctx, commitConfiguration = commitJiraConfiguration) {
     this.token = { configured: false, writable: true };
     this.configuration = null;
     this.boardSourcesDraft = null;
     this.promptTemplatesDraft = null;
     this.imageProcessingDraft = null;
     this.baseUrlDraft = null;
+    this.nativeBaseUrl = null;
     this.tokenDraft = "";
     this.projects = [];
     this.filters = [];
@@ -1534,14 +1508,24 @@ var JiraConfigCardController = class {
     this.failed = false;
     this.failureMessage = "";
     this.scope = scope;
-    this.api = api;
+    this.ctx = ctx;
     this.commitConfiguration = commitConfiguration;
-    this.store = (0, import_client.createSnapshotStore)(this.projection());
-    scope.subscribe(() => {
+    this.observedSettingsBaseUrl = currentBaseUrl(scope.getSnapshot().value);
+    this.store = (0, import_dsh_client_store.createSnapshotStore)(this.projection());
+    this.unsubscribe = scope.subscribe(() => {
+      const snapshot2 = scope.getSnapshot();
+      const baseUrl = currentBaseUrl(snapshot2.value);
+      if (snapshot2.status === "ready" && baseUrl !== this.observedSettingsBaseUrl) {
+        this.observedSettingsBaseUrl = baseUrl;
+        this.nativeBaseUrl = baseUrl;
+      }
       this.publish();
-      if (this.configuration !== null) void this.syncSettingsBaseUrl(this.configuration.baseUrl);
     });
     void Promise.allSettled([this.readToken(), this.readConfiguration()]);
+  }
+  /** Release the form subscription when the Client plugin unloads. */
+  dispose() {
+    this.unsubscribe();
   }
   effectiveBoardSources() {
     return cloneBoardSources(this.boardSourcesDraft ?? this.configuration?.boardSources ?? EMPTY_BOARD_SOURCES);
@@ -1556,7 +1540,7 @@ var JiraConfigCardController = class {
   }
   projection() {
     const snapshot2 = this.scope.getSnapshot();
-    const persistedBaseUrl = this.configuration !== null ? this.configuration.baseUrl : currentBaseUrl(snapshot2.value);
+    const persistedBaseUrl = this.nativeBaseUrl ?? (this.configuration !== null ? this.configuration.baseUrl : currentBaseUrl(snapshot2.value));
     const baseUrlText = this.baseUrlDraft ?? persistedBaseUrl;
     const boardSources = this.effectiveBoardSources();
     const promptTemplates = this.effectivePromptTemplates();
@@ -1595,7 +1579,6 @@ var JiraConfigCardController = class {
       this.failed = false;
       this.failureMessage = "";
       this.publish();
-      void this.syncSettingsBaseUrl(this.configuration.baseUrl);
       await this.loadOptions();
     } catch (error) {
       this.loading = false;
@@ -1606,9 +1589,9 @@ var JiraConfigCardController = class {
   }
   async readToken() {
     try {
-      const response = await this.api.credentials.describe({ refs: [JIRA_WORKBENCH_TOKEN_REF] });
-      if (!response.result.ok) return;
-      const view = response.result.value.credentials[JIRA_WORKBENCH_TOKEN_REF];
+      const response = await this.ctx.remote.credentials.describe([JIRA_WORKBENCH_TOKEN_REF]);
+      if (!response.ok) return;
+      const view = response.value[JIRA_WORKBENCH_TOKEN_REF];
       this.token = {
         configured: view?.configured ?? false,
         writable: view?.writable ?? true
@@ -1782,8 +1765,8 @@ var JiraConfigCardController = class {
     const token = this.tokenDraft.trim();
     if (token !== "") {
       try {
-        const response = await this.api.credentials.set({ ref: JIRA_WORKBENCH_TOKEN_REF, value: token });
-        landed = response.result.ok;
+        const response = await this.ctx.remote.credentials.set(JIRA_WORKBENCH_TOKEN_REF, token);
+        landed = response.ok;
         if (!landed) failureMessage = "DSH \u672A\u63A5\u53D7 Jira Token\u3002";
       } catch (error) {
         landed = false;
@@ -1805,6 +1788,7 @@ var JiraConfigCardController = class {
     }
     if (landed) {
       this.baseUrlDraft = null;
+      this.nativeBaseUrl = null;
       this.tokenDraft = "";
       this.boardSourcesDraft = null;
       this.promptTemplatesDraft = null;
@@ -2133,21 +2117,22 @@ var en = {
 };
 
 // src/client/index.ts
-var inject = ["slots", "locale", "connection", "settingsScope", "sessions"];
+var inject = ["slots", "locale", "remote", "remote.credentials", "configForms", "sessions", "uiWorkspace"];
 function apply(ctx) {
-  const { api } = ctx.get("connection");
   ctx.effect(() => ctx.locale.register(NS, { zh, en }), "ui-jira-workbench: dictionaries");
   const card = new JiraConfigCardController(
-    ctx.settingsScope.bind({ namespace: JIRA_WORKBENCH_NS }),
-    api
+    ctx.configForms.get(JIRA_WORKBENCH_NS),
+    ctx
   );
-  const rootSlots = ctx.slots;
-  const openSessionWhenVisible = (sessionId) => {
+  ctx.effect(() => () => {
+    card.dispose();
+  }, "ui-jira-workbench: configuration subscription");
+  const openSessionWhenVisible = async (sessionId) => {
     const id = sessionId;
     const visible = () => ctx.sessions.list.getSnapshot().byId[id] !== void 0;
     if (visible()) {
-      ctx.sessions.open(id);
-      return Promise.resolve();
+      ctx.uiWorkspace.openSession(id);
+      return;
     }
     return new Promise((resolve, reject) => {
       let unsubscribe = () => {
@@ -2160,20 +2145,22 @@ function apply(ctx) {
         if (!visible()) return;
         window.clearTimeout(timer);
         unsubscribe();
-        ctx.sessions.open(id);
-        resolve();
+        try {
+          ctx.uiWorkspace.openSession(id);
+          resolve();
+        } catch (error) {
+          reject(error);
+        }
       });
     });
   };
-  const settingsPluginIdentity = { id: JIRA_WORKBENCH_NS };
-  ctx.slots.inject("settings.plugin.item", () => ctx.slots.register({
-    name: "settings.plugin.item",
-    key: JIRA_WORKBENCH_NS,
-    ...settingsPluginIdentity,
+  ctx.slots.inject("plugins.bundle.config", () => ctx.slots.register({
+    name: "plugins.bundle.config",
+    key: "@jira-workbench/dsh",
     locale: NS,
     inject: () => card.inject()
   }, JiraConfigCard));
-  rootSlots.inject("shell.overlay", () => rootSlots.register({
+  ctx.slots.inject("shell.overlay", () => ctx.slots.register({
     name: "shell.overlay",
     id: "jira-workbench-surface",
     order: 0,

@@ -4,9 +4,11 @@
  * and Skill references are persisted by the shared Core config store.
  */
 
-import type { IApiClient } from '@deepseek-ai/dsh-client-connection/client'
-import type { SettingsScope, SnapshotStore } from '@deepseek-ai/dsh-client-runtime/client'
-import { createSnapshotStore } from '@deepseek-ai/dsh-client-runtime/client'
+import type { Context as ClientContext } from '@deepseek-ai/cordis'
+import type {} from '@deepseek-ai/dsh-api-remotes/client'
+import type {} from '@deepseek-ai/dsh-api-settings-controller/remote'
+import { createSnapshotStore, type SnapshotStore } from '@deepseek-ai/dsh-client-store'
+import type { ConfigForm } from '@deepseek-ai/dsh-client-ui-settings/client'
 
 export const JIRA_WORKBENCH_NS = 'jira-workbench'
 export const JIRA_WORKBENCH_TOKEN_REF = 'JIRA_WORKBENCH_TOKEN'
@@ -282,14 +284,17 @@ export interface JiraConfigCardFace extends JiraConfigCardActions {
 
 export class JiraConfigCardController {
   private readonly store: SnapshotStore<JiraConfigCardState>
-  private readonly scope: SettingsScope<JiraWorkbenchSettings>
-  private readonly api: Pick<IApiClient, 'credentials'>
+  private readonly scope: ConfigForm<JiraWorkbenchSettings>
+  private readonly ctx: ClientContext
+  private readonly unsubscribe: () => void
   private token: TokenState = { configured: false, writable: true }
   private configuration: WorkbenchConfiguration | null = null
   private boardSourcesDraft: BoardSources | null = null
   private promptTemplatesDraft: PromptTemplates | null = null
   private imageProcessingDraft: ImageProcessingSettings | null = null
   private baseUrlDraft: string | null = null
+  private nativeBaseUrl: string | null = null
+  private observedSettingsBaseUrl: string
   private tokenDraft = ''
   private projects: JiraProjectOption[] = []
   private filters: JiraFilterOption[] = []
@@ -306,19 +311,30 @@ export class JiraConfigCardController {
   private readonly commitConfiguration: CommitJiraConfiguration
 
   constructor(
-    scope: SettingsScope<JiraWorkbenchSettings>,
-    api: Pick<IApiClient, 'credentials'>,
+    scope: ConfigForm<JiraWorkbenchSettings>,
+    ctx: ClientContext,
     commitConfiguration: CommitJiraConfiguration = commitJiraConfiguration,
   ) {
     this.scope = scope
-    this.api = api
+    this.ctx = ctx
     this.commitConfiguration = commitConfiguration
+    this.observedSettingsBaseUrl = currentBaseUrl(scope.getSnapshot().value)
     this.store = createSnapshotStore(this.projection())
-    scope.subscribe(() => {
+    this.unsubscribe = scope.subscribe(() => {
+      const snapshot = scope.getSnapshot()
+      const baseUrl = currentBaseUrl(snapshot.value)
+      if (snapshot.status === 'ready' && baseUrl !== this.observedSettingsBaseUrl) {
+        this.observedSettingsBaseUrl = baseUrl
+        this.nativeBaseUrl = baseUrl
+      }
       this.publish()
-      if (this.configuration !== null) void this.syncSettingsBaseUrl(this.configuration.baseUrl)
     })
     void Promise.allSettled([this.readToken(), this.readConfiguration()])
+  }
+
+  /** Release the form subscription when the Client plugin unloads. */
+  dispose(): void {
+    this.unsubscribe()
   }
 
   private effectiveBoardSources(): BoardSources {
@@ -337,11 +353,11 @@ export class JiraConfigCardController {
 
   private projection(): JiraConfigCardState {
     const snapshot = this.scope.getSnapshot()
-    // The workbench config endpoint is the authority. DSH settings is only a
-    // compatibility mirror and can legitimately arrive later during startup.
-    const persistedBaseUrl = this.configuration !== null
+    // Only newly accepted native URL edits override the Core read. An older
+    // native snapshot must not undo a successful Workbench save.
+    const persistedBaseUrl = this.nativeBaseUrl ?? (this.configuration !== null
       ? this.configuration.baseUrl
-      : currentBaseUrl(snapshot.value)
+      : currentBaseUrl(snapshot.value))
     const baseUrlText = this.baseUrlDraft ?? persistedBaseUrl
     const boardSources = this.effectiveBoardSources()
     const promptTemplates = this.effectivePromptTemplates()
@@ -387,7 +403,6 @@ export class JiraConfigCardController {
       this.failed = false
       this.failureMessage = ''
       this.publish()
-      void this.syncSettingsBaseUrl(this.configuration.baseUrl)
       await this.loadOptions()
     } catch (error) {
       this.loading = false
@@ -399,9 +414,9 @@ export class JiraConfigCardController {
 
   private async readToken(): Promise<void> {
     try {
-      const response = await this.api.credentials.describe({ refs: [JIRA_WORKBENCH_TOKEN_REF] })
-      if (!response.result.ok) return
-      const view = response.result.value.credentials[JIRA_WORKBENCH_TOKEN_REF]
+      const response = await this.ctx.remote.credentials.describe([JIRA_WORKBENCH_TOKEN_REF])
+      if (!response.ok) return
+      const view = response.value[JIRA_WORKBENCH_TOKEN_REF]
       this.token = {
         configured: view?.configured ?? false,
         writable: view?.writable ?? true,
@@ -580,8 +595,8 @@ export class JiraConfigCardController {
 
     if (token !== '') {
       try {
-        const response = await this.api.credentials.set({ ref: JIRA_WORKBENCH_TOKEN_REF, value: token })
-        landed = response.result.ok
+        const response = await this.ctx.remote.credentials.set(JIRA_WORKBENCH_TOKEN_REF, token)
+        landed = response.ok
         if (!landed) failureMessage = 'DSH 未接受 Jira Token。'
       } catch (error) {
         landed = false
@@ -605,6 +620,7 @@ export class JiraConfigCardController {
 
     if (landed) {
       this.baseUrlDraft = null
+      this.nativeBaseUrl = null
       this.tokenDraft = ''
       this.boardSourcesDraft = null
       this.promptTemplatesDraft = null
@@ -630,7 +646,7 @@ export class JiraConfigCardController {
     } catch {
       // The plugin-owned /jira-workbench/config write already landed. A late or
       // read-only DSH settings mirror must not turn that successful save into a
-      // visible failure; the next scope refresh retries convergence.
+      // visible failure; a later explicit save can retry the mirror.
     }
   }
 

@@ -1,7 +1,7 @@
 /** Sidebar entry that toggles the Jira workspace in DSH's main content area. */
 
 import { useSyncExternalStore } from 'react'
-import { IconChecklistOutline14 } from '@deepseek-ai/dsh-client-ui-primitives'
+import { IconChecklistOutlineMedium } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
 import { jiraWorkspaceStore } from './jira-workspace-store.ts'
@@ -32,7 +32,7 @@ export function JiraPanel(props: JiraPanelProps) {
         aria-pressed={active}
         onClick={() => { jiraWorkspaceStore.toggleBoard() }}
       >
-        <IconChecklistOutline14 />
+        <IconChecklistOutlineMedium size={14} />
         {wide && <span className={css.label}>{t('panel.trigger')}</span>}
       </button>
     </div>

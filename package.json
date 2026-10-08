@@ -1,6 +1,6 @@
 {
   "name": "jira-workbench",
-  "version": "0.33.7",
+  "version": "0.33.8",
   "private": true,
   "type": "module",
   "description": "Local Jira and SVN service with an official Codex Plugin, MCP Apps workbench, App Server integration, and a minimal Windows desktop UI host.",
@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "test": "node --test \"packages/core/test/*.test.mjs\" \"packages/codex/test/*.test.mjs\" \"packages/dsh/test/*.test.mjs\" && npm run test:dsh-client",
-    "test:dsh-client": "npm --workspace @jira-workbench/dsh-client run typecheck && npm --workspace @jira-workbench/dsh-client run build",
+    "test:dsh-client": "npm --workspace @jira-workbench/dsh-client run typecheck && npm --workspace @jira-workbench/dsh-client run build && node --test \"packages/dsh-client/test/*.test.mjs\"",
     "release:npm:verify": "node scripts/publish-npm.mjs --dry-run",
     "release:npm:publish": "node scripts/publish-npm.mjs"
   },

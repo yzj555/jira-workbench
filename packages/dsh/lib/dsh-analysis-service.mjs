@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { dirname, join } from "node:path";
 import { buildIssueDetailSnapshot, buildIssuePrompt, isBugIssue } from "@jira-workbench/core/index.mjs";
 import { createDshImageContextService } from "./dsh-image-context-service.mjs";
+import { resolveDshSessionGateway } from "./dsh-session-gateway.mjs";
 
 const FIRST_TURN_GUARD = "【首轮约束】本轮只能进行需求理解、诊断分析和影响评估；禁止修改代码、配置、文件或数据，禁止执行提交。";
 const IMAGE_MIME_TYPES = new Set(["image/png", "image/jpeg", "image/webp", "image/gif"]);
@@ -181,10 +182,10 @@ async function requireRpcResult(promise, operation, { sessionId = "" } = {}) {
 }
 
 function requireApiProxy(ctx) {
-  const apiProxy = ctx?.get?.("apiProxy");
+  const apiProxy = resolveDshSessionGateway(ctx);
   if (!apiProxy?.sessions?.create || !apiProxy?.sessions?.prompt) {
     throw new DshAnalysisServiceError("DSH 会话服务暂不可用，请稍后重试。", {
-      code: "DSH_API_PROXY_UNAVAILABLE",
+      code: "DSH_SESSION_CONTROLLER_UNAVAILABLE",
       statusCode: 503
     });
   }

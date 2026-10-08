@@ -6,7 +6,7 @@
 #    到 DSH 的 ctx.tools。模型侧工具名就是 core 的原始工具名（jira_list_my_tasks
 #    等），不再有 mcp__jira-workbench__ 前缀。
 # 2. ui-jira-workbench —— @jira-workbench/dsh-client（client 半），浏览器端注册
-#    插件配置卡片（settings.plugin.item，key = jira-workbench）与侧边栏看板入口。
+#    插件配置页（plugins.bundle.config，key = @jira-workbench/dsh）与侧边栏看板入口。
 #    客户端扫描据此发现 dsh.client 声明并 serve ./client（lib/client.js，由
 #    esbuild 构建，见该包的 scripts/build-client.mjs）。
 #

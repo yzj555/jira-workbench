@@ -1,7 +1,7 @@
 /** Root-level Jira workspace occupying DSH's main content while preserving its sidebar. */
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
-import { IconCloseOutline16 } from '@deepseek-ai/dsh-client-ui-primitives'
+import { IconCloseOutlineMedium } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { InjectFace, PropsLocale } from '@deepseek-ai/dsh-client-ui-slots'
 import type { JiraConfigCardFace } from './jira-config-card-controller.ts'
 import { JiraConfigCard } from './JiraConfigCard.tsx'
@@ -186,7 +186,7 @@ export function JiraWorkspaceSurface(props: JiraWorkspaceSurfaceProps) {
               <span>返回任务工作台</span>
             </button>
             <button type="button" className={css.iconButton} aria-label={props.t('panel.close')} onClick={() => { jiraWorkspaceStore.close() }}>
-              <IconCloseOutline16 size={16} />
+              <IconCloseOutlineMedium size={16} />
             </button>
           </div>
         </header>

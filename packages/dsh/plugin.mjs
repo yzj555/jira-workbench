@@ -5,8 +5,8 @@
 // 模型侧工具名就是 core 的原始工具名（jira_list_my_tasks 等），不再有
 // mcp__jira-workbench__ 前缀。
 //
-// 本插件注入 tools、workspaceRegistry、sessionQuery、apiProxy 与 agentDefaultModel：前两类目录
-// 分别提供 DSH 项目/会话，apiProxy 负责原生新建会话、读取 Skill 并发送首条
+// 本插件注入 tools、workspaceRegistry、sessionQuery、sessionController 与 agentDefaultModel：前两类目录
+// 分别提供 DSH 项目/会话，sessionController 负责原生新建会话并发送首条
 // 消息。credentials/approval/webServer/settings 仍按能力可选注入。core 通过
 // ESM import 直接加载，不 import 任何 DSH 的 TypeScript 包。
 
@@ -15,7 +15,7 @@ import { readFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { basename, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import sm from "schemastery";
+import sm from "@deepseek-ai/schemastery";
 import { z } from "zod/v4";
 import {
   buildIssueDetailSnapshot,
@@ -41,11 +41,16 @@ import { createDshCredentialSecretStore } from "./lib/dsh-credential-secret-stor
 import { createDshApprovalProvider, runWithAgent } from "./lib/dsh-approval-provider.mjs";
 import { createDshConversationService } from "./lib/dsh-conversation-service.mjs";
 import { createDshAnalysisService } from "./lib/dsh-analysis-service.mjs";
+import { resolveDshSessionGateway } from "./lib/dsh-session-gateway.mjs";
+import { installDshSettingsCompatibility } from "./lib/dsh-settings-compatibility.mjs";
 
-// DSH settings schema 用 schemastery（DSH 的 ctx.settings.register 要求 schema 是
-// 可调用 + 有 toJSON 的校验函数，zod 不满足）。上游 schemastery@3.18 与 DSH
-// vendored 的 @deepseek-ai/schemastery@3.18 同源，API 兼容。
+// DSH settings requires its native Config schema, including volatile references.
 const smz = sm;
+
+export const Config = smz.object({
+  baseUrl: smz.string().default("").volatile(),
+  version: smz.string()
+});
 
 // DSH settings namespace（可视配置：baseUrl 等非 secret；token 走 credential-ref
 // 不进 settings）。命名空间须匹配 ^[a-z][a-z0-9-]*$。
@@ -76,7 +81,7 @@ export function dshConfigFile(env = process.env, osHome = homedir()) {
 
 export const name = "jira-workbench";
 
-export const inject = ["tools", "workspaceRegistry", "sessionQuery", "apiProxy", "agentDefaultModel"];
+export const inject = ["tools", "workspaceRegistry", "sessionQuery", "sessionController", "agentDefaultModel"];
 
 export function createDshWorkspaceCatalog(ctx) {
   return {
@@ -310,7 +315,7 @@ export function createDshConfigOptionsHandler({
 
         // Host 全局 registry 可直接按 cwd 枚举；部分 DSH preset 会把 Skill
         // registry 隔离在 agent realm 中，此时 ctx.get("skills") 看不到，必须
-        // 通过官方 apiProxy.skills.list(sessionId) 读取该会话真实可用的目录。
+        // 通过官方 Session Skill Catalog 读取该会话真实可用的目录。
         const skills = typeof getSkills === "function" ? await getSkills() : null;
         if (skills && typeof skills.list === "function") {
           available = true;
@@ -663,7 +668,7 @@ export async function apply(ctx, config = {}) {
   const core = createCoreService({
     dataRoot: dshDataRoot(),
     configFile: dshConfigFile(),
-    version: config.version || "0.33.7",
+    version: config.version || "0.33.8",
     workspaceCatalog,
     ...(secretStore ? { secretStore } : {})
   });
@@ -787,7 +792,7 @@ export async function apply(ctx, config = {}) {
         jira: core.jira,
         workspaceCatalog,
         getSkills: () => ctx.get("skills"),
-        getApiProxy: () => ctx.get("apiProxy"),
+        getApiProxy: () => resolveDshSessionGateway(ctx),
         getAgents: () => ctx.get("agents"),
         listThreads: (options) => conversations.listThreads(options),
         getLlm: () => ctx.get("llm")
@@ -812,51 +817,19 @@ export async function apply(ctx, config = {}) {
     };
   });
 
-  // 配置面板：注册 DSH settings namespace（baseUrl 等可视配置）。
-  // settings 是可选服务，缺失时配置面板不可用但工具照常跑。
+  // DSH 0.2 uses plugin Config + SettingsForms; older hosts own namespaces.
+  // Keep the Core config file and credential reference as the authoritative
+  // store for Jira-specific preferences while aligning the native URL field.
   ctx.inject(["settings"], (settingsCtx) => {
-    const settings = settingsCtx.settings;
-    const schema = smz.object({
-      baseUrl: smz.string().default("")
+    const synchronization = installDshSettingsCompatibility({
+      ctx: settingsCtx,
+      ownerContext: ctx,
+      config,
+      configStore: core.configStore,
+      namespace: SETTINGS_NAMESPACE,
+      tokenReference: CREDENTIAL_REF_TOKEN,
+      legacySchema: smz.object({ baseUrl: smz.string().default("") })
     });
-    const scope = settings.register(SETTINGS_NAMESPACE, schema);
-
-    // Namespace registration itself is not represented by a settings document
-    // write in DSH rc.7. Its Plugins directory may therefore finish the first
-    // describe() just before this optional injection runs and never discover
-    // the Jira card. Publish one directory invalidation after registration;
-    // listeners already mounted re-read, while listeners mounted later see the
-    // namespace in their initial read.
-    settingsCtx.emit("settings/document-updated", SETTINGS_NAMESPACE, 0);
-
-    // 回填：settings 里没有 baseUrl 时，从 config.json 同步进来（首次挂载时
-    // 让用户看到已配置的值）。
-    void core.configStore.load().then((loaded) => {
-      const current = scope.get();
-      if (!current.baseUrl && loaded.baseUrl) {
-        void scope.update({ baseUrl: loaded.baseUrl });
-      }
-    }).catch(() => {
-      // config.json 缺失或未配置时静默：settings 保持空，用户首次填写。
-    });
-
-    // 用户在 settings 卡片改 baseUrl 后，把 DSH credentials 的固定 Token 引用
-    // 一并写回 config.json。错误保留在控制台，客户端专用卡片会通过上面的
-    // /jira-workbench/config 路由获得同步失败回执。
-    const unwatch = scope.watch((next, prev) => {
-      if (next.baseUrl !== prev.baseUrl) {
-        void core.configStore.updateCredentialReference({
-          baseUrl: next.baseUrl,
-          tokenReference: CREDENTIAL_REF_TOKEN
-        }).catch((error) => {
-          console.error("jira-workbench: Jira 连接配置同步失败。", error);
-        });
-      }
-    });
-
-    return () => {
-      unwatch();
-      // settings.register 已通过 fiber effect 注册 disposer，这里无需手动移除。
-    };
+    return synchronization.dispose;
   });
 }

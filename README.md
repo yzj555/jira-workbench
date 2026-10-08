@@ -1,6 +1,6 @@
 # Jira 工作台
 
-> 当前版本：`0.33.7`<br>
+> 当前版本：`0.33.8`<br>
 > 运行环境：Windows Codex Desktop 或 DeepSeek Harness + Jira Data Center<br>
 > 使用方式：个人本地运行，每位用户配置自己的 Jira PAT，数据和会话绑定彼此独立
 
@@ -87,7 +87,7 @@ cd jira-workbench
 
 ### 安装到 DeepSeek Harness
 
-当前验证版本为 DeepSeek Harness `0.1.0-rc.7`。普通用户只需三步，不需要下载或解压本仓库：
+当前适配目标为 DeepSeek Harness `0.2.0-rc.2`；DSH 仍在快速迭代，升级宿主时须核对插件兼容版本。普通用户只需三步，不需要下载或解压本仓库：
 
 1. 确认 `dsh web` 和 `pnpm` 可以正常运行。
 2. 在 PowerShell 执行：
@@ -97,7 +97,7 @@ dsh plugin --profile web add @jira-workbench/dsh
 dsh web
 ~~~
 
-3. 浏览器打开 DSH 后，在“设置 → 插件 → Jira 工作台”填写 Jira 地址和 PAT，再从侧边栏打开“Jira 工作台”。
+3. 浏览器使用 `dsh web` 输出的地址打开 DSH，在“插件 → Jira 工作台 → 配置”填写 Jira 地址和 PAT，再从侧边栏打开“Jira 工作台”。
 
 `@jira-workbench/dsh` 会自动安装同版本的 Core 与浏览器 Client，并把 bundle patch 加入目标 profile；不需要手工修改 profile、下载 Release、复制 `cordis.patch.yml` 或创建 junction。使用 DSH 源码运行的开发者以及需要升级、卸载或离线安装的用户，参见详细手册。
 

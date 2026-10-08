@@ -7,7 +7,7 @@
  * - 外层：`window.__ModuleLoader__.load({ id, factory: (require) => { … } })`，
  *   工厂内部 `var module = { exports: {} }; var exports = module.exports;`。
  * - externals（走工厂参数 `require`，由 DSH shell 的冻结模块表回答）：
- *   react / react/jsx-runtime / @deepseek-ai/dsh-client-runtime/client /
+ *   react / react/jsx-runtime / @deepseek-ai/dsh-client-store /
  *   @deepseek-ai/dsh-client-ui-primitives。
  * - clsx 等非 externals 依赖内联进 bundle。
  * - CSS Modules：lightningcss 编译成 `[hash]_[local]` class map，并把样式文本
@@ -36,7 +36,7 @@ const ID = '@jira-workbench/dsh-client'
 const EXTERNALS = [
   'react',
   'react/jsx-runtime',
-  '@deepseek-ai/dsh-client-runtime/client',
+  '@deepseek-ai/dsh-client-store',
   '@deepseek-ai/dsh-client-ui-primitives',
 ]
 

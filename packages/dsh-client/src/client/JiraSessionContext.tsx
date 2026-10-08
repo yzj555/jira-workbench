@@ -2,13 +2,14 @@
 
 import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type RefObject } from 'react'
 import {
-  IconChevronDownOutline14,
-  IconCloseOutline16,
-  IconEllipsisOutline16,
+  IconChevronDownOutlineMedium,
+  IconCloseOutlineMedium,
+  IconEllipsisOutlineMedium,
   StateDot,
 } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
+import type {} from '@deepseek-ai/dsh-client-ui-session/client'
 import type { JiraSessionContextResult } from './jira-session-context-api.ts'
 import { jiraWorkspaceStore } from './jira-workspace-store.ts'
 import css from './JiraSessionContext.module.css'
@@ -186,7 +187,7 @@ export function JiraSessionContext({
           : <StateDot state={loadError ? 'warning' : 'ongoing'} />}
         <span className={css.triggerLabel}>{context ? context.issueKey : t('context.errorShort')}</span>
         {context && issue && <span className={css.triggerStatus}>{issue.statusName}</span>}
-        {context && issue && <IconChevronDownOutline14 className={open ? css.triggerChevronOpen : css.triggerChevron} />}
+        {context && issue && <IconChevronDownOutlineMedium size={14} className={open ? css.triggerChevronOpen : css.triggerChevron} />}
       </button>
 
       {open && context && issue
@@ -212,7 +213,7 @@ export function JiraSessionContext({
                     aria-expanded={moreOpen}
                     onClick={() => { setMoreOpen(current => !current); setConfirmUnlink(false) }}
                   >
-                    <IconEllipsisOutline16 size={16} />
+                    <IconEllipsisOutlineMedium size={16} />
                   </button>
                   {moreOpen && (
                     <div className={css.moreMenu} role="menu">
@@ -234,7 +235,7 @@ export function JiraSessionContext({
                   aria-label={t('context.collapse')}
                   onClick={() => { setOpen(false); triggerRef.current?.focus() }}
                 >
-                  <IconCloseOutline16 size={14} />
+                  <IconCloseOutlineMedium size={14} />
                 </button>
               </div>
             </header>

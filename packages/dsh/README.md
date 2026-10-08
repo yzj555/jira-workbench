@@ -2,8 +2,8 @@
 
 DeepSeek Harness（DSH）Host 适配层。它在 DSH 进程内组装 `@jira-workbench/core`，把 Jira/JXL/SVN 工具注册到 Cordis，并把 DSH 的 credentials、approval、项目目录、会话目录和会话创建能力注入业务核。它不启动第二个 Jira HTTP 业务进程，也不使用 `dsh-mcp-client` 转接工具。
 
-> 当前 Jira Workbench 版本：`0.33.7`<br>
-> 当前验证的 DSH 版本：`0.1.0-rc.7`<br>
+> 当前 Jira Workbench 版本：`0.33.8`<br>
+> 当前适配的 DSH 版本：`0.2.0-rc.2`<br>
 > 详细安装、升级、卸载与故障排查：[INSTALL.md](INSTALL.md)
 
 ## 组成与职责
@@ -42,7 +42,7 @@ dsh web
 
 DSH Client 提供四个原生接入点：
 
-1. “设置 → 插件 → Jira 工作台”只配置 Jira 根地址和 PAT 状态。
+1. “插件 → Jira 工作台 → 配置”只配置 Jira 根地址和 PAT 状态。
 2. 侧边栏“Jira 工作台”打开中心主工作区，不嵌套第二层 DSH Modal。
 3. 工作台内的“设置”负责需求/Bug 面板来源、消息模板与 DSH Skill。
 4. 已关联会话在摘要栏右侧显示 Jira 入口，展开紧凑浮窗；任务详情和 SVN 审核进入中心主工作区。
@@ -56,7 +56,7 @@ Core 在 DSH 中提供 27 个工具：13 个只读工具和 14 个受审批写�
 - 没有 `ctx.approval` 时严格 fail closed，只注册 13 个只读工具，不回退为自动许可。
 - 项目目录直接读取 `ctx.workspaceRegistry`；一个 Jira 可绑定多个项目，并指定当前 SVN 主目录。
 - 会话目录直接读取 `ctx.sessionQuery`；会话关联和项目目录绑定是两个独立数据源。
-- “新建并绑定”通过 DSH Host `apiProxy` 创建正式会话，按所选项目解析 Skill，发送只读首条分析消息；消息被 Host 接受后才用 revision CAS 保存关联并跳转。
+- “新建并绑定”通过 DSH Host `sessionController` 创建正式会话，按所选项目解析 Skill，发送只读首条分析消息；消息被 Host 接受后才用 revision CAS 保存关联，Client 再通过 `uiWorkspace.openSession()` 跳转。
 - 需求和 Bug 可分别使用内置 JQL、自定义 JQL 或 Jira Filter，并分别绑定首条消息模板和 DSH Skill。
 - Skill 可用时以 Skill 中的工具、流程、证据和安全约束为准，模板只补充 Skill 未覆盖的 Jira 上下文；Skill 不可用时自动降级到模板。
 - Jira 流转先经过 DSH approval，再签发一次性 grant；提交前会重新验证当前 transition。

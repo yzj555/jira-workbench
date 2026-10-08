@@ -2,9 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import clsx from 'clsx'
-import { IconChevronDownOutline14 } from '@deepseek-ai/dsh-client-ui-primitives'
-import type { InjectFace, PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
-import type {} from '@deepseek-ai/dsh-client-ui-settings-plugins/client'
+import type { InjectFace, PropsLocale } from '@deepseek-ai/dsh-client-ui-slots'
+import type { PluginConfigViewProps } from '@deepseek-ai/dsh-client-ui-plugin-manager/client'
 import type {
   BoardSource,
   DshSkillOption,
@@ -20,7 +19,7 @@ type JiraConfigCardBaseProps =
   & InjectFace<JiraConfigCardFace>
 
 export type JiraConfigCardProps = JiraConfigCardBaseProps
-  & Partial<PropsRuntime<'settings.plugin.item'>>
+  & Partial<PluginConfigViewProps>
   & { readonly standalone?: boolean }
 
 type Section = 'connection' | 'sources' | 'templates' | 'images'
@@ -35,7 +34,6 @@ export function JiraConfigCard(props: JiraConfigCardProps) {
   const { t } = props
   const state = props.useJiraConfigCard(snapshot => snapshot)
   const standalone = props.standalone === true
-  const [open, setOpen] = useState(standalone)
   const [section, setSection] = useState<Section>('connection')
   const settingsContentRef = useRef<HTMLDivElement>(null)
   const sectionRefs = useRef<Record<Section, HTMLElement | null>>({
@@ -73,7 +71,6 @@ export function JiraConfigCard(props: JiraConfigCardProps) {
     setSection(next)
     content.scrollTo({ top, behavior: reduceMotion ? 'auto' : 'smooth' })
   }
-  const title = t('card.title')
   const blocked = !state.dirty || state.invalid || state.saving || state.loading
   const projectChoices = state.projects.map(project => ({
     value: project.key,
@@ -96,33 +93,14 @@ export function JiraConfigCard(props: JiraConfigCardProps) {
       }, ...discoveredVisionChoices]
     : discoveredVisionChoices
 
+  if (props.view === 'summary' && !standalone) return <p>{t('card.pluginDescription')}</p>
+
   return (
     <div className={clsx(
       css.card,
-      open && css.cardOpen,
+      css.cardOpen,
       standalone ? css.workspaceCard : css.pluginCard,
     )}>
-      {!standalone
-        ? (
-          <button
-            type="button"
-            className={css.header}
-            aria-expanded={open}
-            aria-label={`${open ? 'Collapse' : 'Expand'}: ${title}`}
-            onClick={() => { setOpen(!open) }}
-          >
-            <span className={css.brandMark}>JW</span>
-            <span className={css.headText}>
-              <span className={css.name}>{title}</span>
-              <span className={css.description}>{t('card.pluginDescription')}</span>
-            </span>
-            {state.dirty ? <span className={css.pending}>{t('card.unsaved')}</span> : null}
-            <IconChevronDownOutline14 className={clsx(css.chevron, open && css.chevronOpen)} />
-          </button>
-        )
-        : null}
-      {open || standalone
-        ? (
           <div className={css.body}>
             {standalone
               ? (
@@ -390,8 +368,6 @@ export function JiraConfigCard(props: JiraConfigCardProps) {
               </button>
             </div>
           </div>
-        )
-        : null}
     </div>
   )
 }

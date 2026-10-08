@@ -191,7 +191,7 @@ test("DSH 会话详情、SVN 与设置统一进入主内容区工作台", async 
   assert.match(panel, /data-jira-workbench-trigger/);
   assert.match(surface, /addEventListener\('pointerdown', onPointerDown, true\)/);
   assert.match(surface, /rootRef\.current\?\.contains\(target\)/);
-  assert.match(entry, /rootSlots\.inject\('shell\.overlay'/);
+  assert.match(entry, /ctx\.slots\.inject\('shell\.overlay'/);
   assert.match(entry, /id: 'jira-workbench-surface'/);
   assert.match(ui, /const EMBED_DETAIL_MODE/);
   assert.match(ui, /const WORKSPACE_EMBED_MODE/);

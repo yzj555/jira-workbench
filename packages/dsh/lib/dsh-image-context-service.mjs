@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { readFile } from "node:fs/promises";
+import { resolveDshSessionGateway } from "./dsh-session-gateway.mjs";
 import { createImageContextCache, createLocalImageOcr } from "@jira-workbench/core/index.mjs";
 
 const SUPPORTED_IMAGE_TYPES = new Set(["image/png", "image/jpeg", "image/webp", "image/gif"]);
@@ -45,7 +46,7 @@ function visionFailure(error, route) {
 }
 
 async function currentModelImageCapability(ctx, sessionId) {
-  const apiProxy = ctx?.get?.("apiProxy");
+  const apiProxy = resolveDshSessionGateway(ctx);
   const llm = ctx?.get?.("llm");
   if (!apiProxy?.sessions?.models || !llm?.resolveModelInfo) return { supported: null };
   try {

@@ -2,7 +2,7 @@
  * Jira workbench UI plugin, browser half. Four surface contributions over the
  * state owned by the external `@jira-workbench/dsh` host plugin:
  *
- * - a `settings.plugin.item` card (the Jira URL + token) bound to the
+ * - a `plugins.bundle.config` page (the Jira URL + token) bound to the
  *   `jira-workbench` settings namespace the host registers, with the token
  *   written through the credentials domain (fixed `JIRA_WORKBENCH_TOKEN`
  *   reference), and
@@ -12,58 +12,56 @@
  *   linked to the current native DSH session.
  */
 
-import type { ConnectionHandle } from '@deepseek-ai/dsh-client-connection/client'
+import type { Context as ClientContext } from '@deepseek-ai/cordis'
+// Type-only: pulls the generated Remote namespaces (ctx.remote).
+import type { SessionId } from '@deepseek-ai/dsh-api-remotes/client'
+import type {} from '@deepseek-ai/dsh-api-settings-controller/remote'
 // Type-only: pulls the locale plugin's Context merge (ctx.locale).
 import type {} from '@deepseek-ai/dsh-client-locale/client'
-import type { ClientContext } from '@deepseek-ai/dsh-client-runtime/client'
-// Type-only: pulls the settings shell's SlotMap merge and ctx.settingsScope.
+// Type-only: pulls the session-controller Context merge (ctx.sessions).
+import type {} from '@deepseek-ai/dsh-api-session-controller/client'
+// Type-only: pulls the settings shell's SlotMap merge and ctx.configForms.
 import type {} from '@deepseek-ai/dsh-client-ui-settings/client'
+// Type-only: pulls workspace-owned Session navigation and the root overlay slot.
+import type {} from '@deepseek-ai/dsh-client-ui-workspace/client'
+import type {} from '@deepseek-ai/dsh-client-ui-layout/client'
 // Type-only: pulls the conversation header action SlotMap merge.
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 // Type-only: pulls the sidebar shell's SlotMap merge (sidebar.footer.action).
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
-// Type-only: pulls ui-settings-plugins' SlotMap merge (settings.plugin.item).
-import type {} from '@deepseek-ai/dsh-client-ui-settings-plugins/client'
+// Type-only: pulls the external bundle's configuration SlotMap merge.
+import type {} from '@deepseek-ai/dsh-client-ui-plugin-manager/client'
+// Type-only: pulls the renderer's Context merge (ctx.slots).
+import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
 import { JiraConfigCard } from './JiraConfigCard.tsx'
 import { JiraPanel } from './JiraPanel.tsx'
 import { JiraSessionContext } from './JiraSessionContext.tsx'
 import { JiraWorkspaceSurface } from './JiraWorkspaceSurface.tsx'
-import { JIRA_WORKBENCH_NS, JiraConfigCardController } from './jira-config-card-controller.ts'
+import { JIRA_WORKBENCH_NS, JiraConfigCardController, type JiraWorkbenchSettings } from './jira-config-card-controller.ts'
 import { clearJiraSessionContext, loadJiraSessionContext } from './jira-session-context-api.ts'
 import { en, NS, zh } from './locales.ts'
 
 /** Required services (cordis fiber inject). */
-export const inject = ['slots', 'locale', 'connection', 'settingsScope', 'sessions']
+export const inject = ['slots', 'locale', 'remote', 'remote.credentials', 'configForms', 'sessions', 'uiWorkspace']
 
 /**
  * Mount the config card, persistent workspace, board action, and session context.
  * @param ctx - the browser plugin context.
  */
 export function apply(ctx: ClientContext): void {
-  const { api } = ctx.get('connection') as ConnectionHandle
   ctx.effect(() => ctx.locale.register(NS, { zh, en }), 'ui-jira-workbench: dictionaries')
 
   const card = new JiraConfigCardController(
-    ctx.settingsScope.bind({ namespace: JIRA_WORKBENCH_NS }),
-    api,
+    ctx.configForms.get<JiraWorkbenchSettings>(JIRA_WORKBENCH_NS),
+    ctx,
   )
-  // ui-layout is a host-owned DSH plugin. This package only contributes to its
-  // additive root slot, so keep the runtime dependency in dsh.client.inject
-  // without coupling this independently built client bundle to its type package.
-  const rootSlots = ctx.slots as unknown as {
-    inject: (name: 'shell.overlay', install: () => () => void) => () => void
-    register: (
-      options: { name: 'shell.overlay', id: string, order: number, locale: typeof NS, inject: () => object },
-      component: typeof JiraWorkspaceSurface,
-    ) => () => void
-  }
-
-  const openSessionWhenVisible = (sessionId: string): Promise<void> => {
-    const id = sessionId as Parameters<typeof ctx.sessions.open>[0]
+  ctx.effect(() => () => { card.dispose() }, 'ui-jira-workbench: configuration subscription')
+  const openSessionWhenVisible = async (sessionId: string): Promise<void> => {
+    const id = sessionId as SessionId
     const visible = () => ctx.sessions.list.getSnapshot().byId[id] !== undefined
     if (visible()) {
-      ctx.sessions.open(id)
-      return Promise.resolve()
+      ctx.uiWorkspace.openSession(id)
+      return
     }
     return new Promise((resolve, reject) => {
       let unsubscribe = () => {}
@@ -75,25 +73,24 @@ export function apply(ctx: ClientContext): void {
         if (!visible()) return
         window.clearTimeout(timer)
         unsubscribe()
-        ctx.sessions.open(id)
-        resolve()
+        try {
+          ctx.uiWorkspace.openSession(id)
+          resolve()
+        } catch (error) {
+          reject(error)
+        }
       })
     })
   }
 
-  // DSH 0.0.1-rc.3 declared this slot as a list (`id`), while rc.7+
-  // dispatches it as keyed (`key`). The registry ignores the unused identity,
-  // so carrying both keeps one bundle compatible with installed DSH profiles.
-  const settingsPluginIdentity = { id: JIRA_WORKBENCH_NS }
-  ctx.slots.inject('settings.plugin.item', () => ctx.slots.register({
-    name: 'settings.plugin.item',
-    key: JIRA_WORKBENCH_NS,
-    ...settingsPluginIdentity,
+  ctx.slots.inject('plugins.bundle.config', () => ctx.slots.register({
+    name: 'plugins.bundle.config',
+    key: '@jira-workbench/dsh',
     locale: NS,
     inject: () => card.inject(),
   }, JiraConfigCard))
 
-  rootSlots.inject('shell.overlay', () => rootSlots.register({
+  ctx.slots.inject('shell.overlay', () => ctx.slots.register({
     name: 'shell.overlay',
     id: 'jira-workbench-surface',
     order: 0,

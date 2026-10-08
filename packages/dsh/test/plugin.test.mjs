@@ -5,6 +5,7 @@ import { join } from "node:path";
 import { Readable } from "node:stream";
 import {
   apply,
+  Config,
   inject,
   name,
   dshConfigFile,
@@ -32,20 +33,8 @@ function responseRecorder() {
   };
 }
 
-test("DSH Client 设置卡片同时兼容旧 list 与新 keyed 插槽标识", async () => {
-  const bundle = await readFile(
-    join(import.meta.dirname, "..", "..", "dsh-client", "lib", "client.js"),
-    "utf8"
-  );
-  assert.match(bundle, /const settingsPluginIdentity = \{ id: JIRA_WORKBENCH_NS \};/);
-  assert.match(
-    bundle,
-    /name: "settings\.plugin\.item",\s*key: JIRA_WORKBENCH_NS,\s*\.\.\.settingsPluginIdentity/
-  );
-});
-
 // 最小 ctx mock：只提供 apply 用到的 get("tools")、effect、inject（可选服务注入）。
-function mockCtx({ credentials, approval, workspaceRegistry, sessionQuery, apiProxy, settings } = {}) {
+function mockCtx({ credentials, approval, workspaceRegistry, sessionQuery, apiProxy, sessionController, settings } = {}) {
   const registered = [];
   const effects = [];
   const emitted = [];
@@ -90,6 +79,10 @@ function mockCtx({ credentials, approval, workspaceRegistry, sessionQuery, apiPr
           async list() { return { result: { ok: true, value: { skills: [] } } }; }
         }
       };
+      if (serviceName === "sessionController") return sessionController || {
+        async create() { return { sessionId: "session-created" }; },
+        async prompt() { return { accepted: true }; }
+      };
       return undefined;
     },
     effect(fn, label) {
@@ -132,6 +125,35 @@ test("DSH settings namespace 注册后主动刷新插件配置目录", async () 
     name === "settings/document-updated" && namespace === "jira-workbench"));
 });
 
+test("新版 SettingsForms 可启动插件，Config 暴露可编辑地址且不调用旧 namespace API", async () => {
+  const parsed = Config({});
+  assert.equal(parsed.baseUrl.get(), "");
+  assert.equal(Config.dict.baseUrl.meta.volatile, true);
+  let configured = 0;
+  let disposed = 0;
+  const settings = {
+    configure(presentation) {
+      assert.deepEqual(presentation, { auto: false });
+      configured += 1;
+      return () => { disposed += 1; };
+    },
+    async update() {}
+  };
+  const { ctx, registered } = mockCtx({ settings });
+  const offSettings = [];
+  const originalInject = ctx.inject;
+  ctx.inject = (services, callback) => {
+    const dispose = originalInject(services, callback);
+    if (services.includes("settings")) offSettings.push(dispose);
+    return dispose;
+  };
+  await apply(ctx, parsed);
+  assert.equal(configured, 1);
+  assert.equal(registered.length, 13);
+  offSettings.forEach((dispose) => dispose());
+  assert.equal(disposed, 1);
+});
+
 test("工作台设置导航不受后台数据请求 busy 状态阻塞", async () => {
   const document = await readFile(
     join(import.meta.dirname, "..", "..", "core", "mcp", "ui", "task-board.html"),
@@ -158,7 +180,7 @@ test("Jira 配置卡片以插件配置服务为准，不因 DSH settings 尚未�
 
 test("无 DSH 审批服务时只注册 13 个只读工具", async () => {
   assert.equal(name, "jira-workbench");
-  assert.deepEqual(inject, ["tools", "workspaceRegistry", "sessionQuery", "apiProxy", "agentDefaultModel"]);
+  assert.deepEqual(inject, ["tools", "workspaceRegistry", "sessionQuery", "sessionController", "agentDefaultModel"]);
 
   const { ctx, registered } = mockCtx();
   await apply(ctx, { version: "0.32.3" });

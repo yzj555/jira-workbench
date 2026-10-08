@@ -22,7 +22,7 @@ dsh web
 
 ### 3. 连接 Jira
 
-1. 浏览器进入“设置 → 插件 → Jira 工作台”。
+1. 使用 `dsh web` 输出的浏览器地址进入“插件 → Jira 工作台 → 配置”。
 2. 填写 Jira Data Center 根地址和当前用户 PAT，点击保存。
 3. 从侧边栏打开“Jira 工作台”；能看到需求和 Bug 列表即安装成功。
 
@@ -46,7 +46,7 @@ dsh plugin --profile web why @jira-workbench/dsh-client
 
 ## 1. 环境要求
 
-- DeepSeek Harness；当前验证版本为 `0.1.0-rc.7`。
+- DeepSeek Harness；当前适配版本为 `0.2.0-rc.2`。包声明的 DSH peer version 用于宿主启动前兼容检查，不会额外安装另一份 DSH。
 - Web profile；默认启动命令是 `dsh web`。
 - Node.js 满足 DSH 要求：`^22.19.0` 或 `>=24.0.0`。
 - `pnpm` 已加入 `PATH`；`dsh plugin` 会在目标 profile 中调用 pnpm。
@@ -70,7 +70,7 @@ pnpm dsh web
 
 ## 2. 首次配置
 
-1. 打开“设置 → 插件 → Jira 工作台”。
+1. 打开“插件 → Jira 工作台 → 配置”。
 2. 填写 Jira 根地址，例如 `http://jira.example.com:8080`；不要填写 `/browse/...` 页面地址。
 3. 填写当前用户 PAT 并保存。Token 写入 DSH credentials 的固定引用 `JIRA_WORKBENCH_TOKEN`，公开设置和 Jira Workbench 数据文件都不保存明文。
 4. 从侧边栏打开“Jira 工作台”。
@@ -167,6 +167,20 @@ dsh web
 使用 `link:` 后 DSH 会继续从该目录加载包，运行期间不能移动或删除它。升级应解压到新目录、重新执行三包链接、验收成功后再删除旧目录。
 
 ## 7. 常见问题
+
+### 更新 DSH 后插件无法启动
+
+DSH `0.2.0-rc.2` 已改变插件配置、设置页面和会话导航接口，旧插件不能仅靠重启恢复。先核对宿主版本，再安装声明兼容该版本的 Jira Workbench；不要使用 `allow-version` 强制放行不兼容包。
+
+源码链接用户在 Jira Workbench 根目录执行以下命令后重启 DSH；无需修改 DSH 源码或删除个人配置：
+
+```powershell
+npm ci
+npm run test:dsh-client
+dsh web
+```
+
+若终端指出其他 bundle 不兼容，需单独升级对应插件。保留原始错误或 DSH 输出的启动诊断路径，不要公开含凭据的原始诊断文件。新版 Web 要求浏览器认证，请使用终端输出的完整启动地址，不要仅手工输入端口。
 
 ### npm 镜像提示找不到包
 
