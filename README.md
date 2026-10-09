@@ -4,6 +4,8 @@
 > 运行环境：Windows Codex Desktop 或 DeepSeek Harness + Jira Data Center<br>
 > 使用方式：个人本地运行，每位用户配置自己的 Jira PAT，数据和会话绑定彼此独立
 
+换设备继续开发或维护，请先读[项目接手与维护指南](docs/PROJECT_HANDOFF.md)：包含当前进度、已发布与未发布范围、安装、发布、数据迁移、排错和后续任务。
+
 Jira 工作台把 Jira 待办、JXL Sheets、Codex 对话和 SVN 提交连接到同一个本地工作台。它通过本机服务读取 Jira，并只在用户明确确认时提交状态流转或已审核的 SVN 改动，适合个人工作环境使用。
 
 这不是部署在 Jira 服务器上的插件，而是一个"固定业务核 + 多宿主适配"的工具：Jira/JXL/SVN 的全部业务规则沉淀在宿主无关的 `@jira-workbench/core`，Codex 与 DeepSeek Harness 只是当前两个接入方式，各自以自己的原生扩展机制适配。
@@ -136,6 +138,7 @@ node packages/core/bin/serve.mjs        # 默认 127.0.0.1:47823
 
 ## 各包文档
 
+- [`docs/PROJECT_HANDOFF.md`](docs/PROJECT_HANDOFF.md) — 换设备接手总入口：架构、制作进度、安装与发布、凭据和数据处理、已知缺口。
 - [`packages/core/README.md`](packages/core/README.md) — 业务核的结构、独立服务、依赖注入约定与核心业务能力（Jira 工作台、状态流转、会话绑定、SVN 审核、自动 Bug 监控）。
 - [`packages/codex/README.md`](packages/codex/README.md) — Codex 适配层：官方 Plugin 工作台、页面说明、会话浮窗、安装/升级/卸载、发布、开发运行与常见问题。
 - [`packages/codex-client/README.md`](packages/codex-client/README.md) — 新增 Codex 原生预览完整插件包、能力边界与隔离测试；[安装说明](packages/codex-client/INSTALL.md)仅用于预览验收。

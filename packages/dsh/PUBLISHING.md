@@ -35,6 +35,8 @@ npm org ls jira-workbench --registry=https://registry.npmjs.org/
 
 npm 已发布版本不可覆盖。修改版本时只运行仓库脚本，不要分别手工改多个 manifest：
 
+下方 `0.33.0` 是历史示例，执行时必须替换为未发布的新版本，不照抄降版或覆盖已发布版本。
+
 ```powershell
 node packages/codex/scripts/set-version.mjs 0.33.0
 npm install --package-lock-only --ignore-scripts
@@ -83,6 +85,10 @@ npm view @jira-workbench/dsh@0.33.0 name version dependencies --registry=https:/
 | Repository | `jira-workbench` |
 | Workflow filename | `release.yml` |
 | Environment | 留空 |
+
+若 npm 设置出现 Allowed actions，应允许本 workflow 使用的直接 `npm publish`，不能只保留 staged publish。Trusted Publishing 使用 OIDC，而非本地 npm 登录；`npm whoami` 不证明 workflow 权限。详见 [npm 官方 Trusted Publishing 说明](https://docs.npmjs.com/trusted-publishers/)。
+
+新建 Publisher 须在 2 天内完成首次成功发布，否则配置过期。人工首发后，同版本 tag 若只跳过已经存在的三个包，不构成 OIDC 发布权限验证；应在明确授权的新版本发布时真正验收，不为探针额外发包。见 [npm 配置时效说明](https://docs.npmjs.com/trusted-publishers/#trusted-publisher-configuration-expiry)。
 
 仓库的 `.github/workflows/release.yml` 已给 npm job 配置 `id-token: write`，并在 GitHub 托管 runner 上使用 Node 22.19 与 npm 11。正式 tag 构建完成后，该 job 会：
 

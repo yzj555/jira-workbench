@@ -92,6 +92,6 @@ npm run build --workspace @jira-workbench/dsh-client
 npm test
 ```
 
-该命令覆盖 Core、Codex、DSH Host 的 Node 测试，并对 DSH Client 执行 TypeScript 检查与构建。提交前还应从干净 Release ZIP 按 [INSTALL.md](INSTALL.md#5-安装后验收) 完成一次 DSH Web 烟雾检查。
+该命令覆盖 Core、Codex、DSH Host 和原生预览测试，并执行 Client 检查与构建。提交前还应按 [INSTALL.md](INSTALL.md#3-安装后验收) 完成一次 DSH Web 烟雾检查；Release ZIP 验证需另准备运行依赖。
 
 当前 provider 边界、工具注册和已知限制见 [DESIGN.md](DESIGN.md)。

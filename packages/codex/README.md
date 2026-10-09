@@ -75,7 +75,7 @@ Plugin、MCP、本地服务、App Server Adapter 和最小 CDP 适配层都属�
 - 默认不创建登录自启；写入 `install-state.json` 组件清单，并在 Windows"已安装的应用"中登记一个"Jira 工作台"。
 - 创建开始菜单"维护 Jira 工作台"入口，统一提供修复、普通卸载和完全清除。
 
-安装器默认执行一次 `npm install -g @openai/codex@latest`（已有独立 CLI 时不会重复安装）。该 CLI 只作为本地 App Server 控制面使用，不替换 Microsoft Store 桌面应用；缺少它会使会话、Skill、后台 turn 和审查等 App Server 能力不可用，但不会让本地 Jira 配置或只读服务丢失。不安装可传 `-InstallCodexCli:$false`。
+安装器默认执行一次 `npm install -g @openai/codex@latest`（已有独立 CLI 时不会重复安装）。该 CLI 不替换 Microsoft Store 桌面应用，并用于插件注册及 App Server 控制面。`-InstallCodexCli:$false` 只禁止自动安装 CLI；仍须已有可用的独立 CLI，否则当前插件注册步骤会失败，不能把缺 CLI 当作安装成功后的单纯能力降级。运行时也可优先发现桌面配套 CLI，与安装时的独立 CLI 前置条件分别核对。
 
 ### 升级
 
@@ -111,7 +111,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\stop-poc.ps1
 
 ### 测试与探测
 
-仓库根 `npm test` 覆盖 core 与 codex 两包测试。本目录的只读探测：
+仓库根 `npm test` 覆盖 Core、既有 Codex、DSH 与 Codex 原生预览，并检查 / 构建 Client。本目录的只读探测：
 
 ~~~powershell
 npm run codex:probe          # 只读检测 App Server，不创建任务或发送消息

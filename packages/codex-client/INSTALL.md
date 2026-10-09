@@ -10,6 +10,8 @@
 
 这不是 npm 发布安装。确认隔离探针通过后，在仓库根目录执行以下两步；`<桌面后端 codex.exe>` 必须替换为当前桌面实际使用的 CLI 绝对路径，不能因为 PATH 中的 `codex` 可用就假定两者版本相同。
 
+先初始化 / 登录 Codex，确认目标 `CODEX_HOME` 已存在、与当前桌面一致，并且 PATH 中有 Node、npm 和 `tar`。首次安装会修改该 home 的配置、Marketplace 注册和插件缓存，不修改 Codex 应用本体；不要把临时测试 home 误当作生产安装目标。
+
 ```powershell
 # 1. 构建并准备持久安装包；此步骤不修改 Codex 配置。
 npm run build:codex-client

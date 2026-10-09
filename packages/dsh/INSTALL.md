@@ -98,23 +98,23 @@ npm test
 
 ## 4. 升级与回滚
 
-停止 DSH 后更新到最新版本：
+停止 DSH 后按现有依赖范围更新：
 
 ```powershell
 dsh plugin --profile web update @jira-workbench/dsh
 dsh web
 ```
 
-如果需要固定或回滚到指定版本：
+`update` 不保证从固定版本跨范围升级到最新。需要确定升级、固定或回滚时，先核对目标版本已经发布且兼容宿主，再安装指定版本，例如：
 
 ```powershell
-dsh plugin --profile web add @jira-workbench/dsh@0.33.0
+dsh plugin --profile web add @jira-workbench/dsh@0.33.8
 dsh web
 ```
 
 升级后用 `why` 核对 Host、Core、Client 三个包版本一致，再刷新浏览器；仍显示旧界面时关闭旧标签页并使用 `Ctrl+F5`。
 
-Jira 配置、credentials、会话绑定、项目绑定、附件缓存和 SVN 审核状态位于 `$DSH_HOME/jira-workbench`，不在 npm 包目录中，正常升级和回滚不会清除个人数据。
+Jira 配置、会话绑定、项目绑定、附件缓存和 SVN 审核状态位于 `$DSH_HOME/jira-workbench`，不在 npm 包目录中；PAT 实际由 DSH credentials provider 保存，工作台配置只存引用。正常升级和回滚不会清除这些个人数据。`--profile` 隔离依赖与 bundle，不隔离工作台数据；同一 `DSH_HOME` 的多个 profile 默认共用该业务数据根。
 
 ## 5. 卸载
 
@@ -124,7 +124,11 @@ Jira 配置、credentials、会话绑定、项目绑定、附件缓存和 SVN �
 dsh plugin --profile web remove @jira-workbench/dsh
 ```
 
-重新启动 DSH 后，侧边栏入口和插件设置卡片应消失。Core 与 Client 是 Host 的依赖，由 pnpm 按依赖关系清理；不要分别手工删除 profile 内的包目录。
+重新启动 DSH 后，侧边栏入口和插件设置卡片应消失。普通 registry 安装中 Core 与 Client 是 Host 的依赖，由 pnpm 按依赖关系清理；不要分别手工删除 profile 内的包目录。若按下文将三个源码包都安装为直接 `link:` 依赖，完整移除时需在同一 profile 一起执行：
+
+```powershell
+dsh plugin --profile web remove @jira-workbench/dsh @jira-workbench/dsh-client @jira-workbench/core
+```
 
 普通卸载会保留 `$DSH_HOME/jira-workbench`。只有明确需要彻底清除个人 Jira Workbench 数据时，才在确认路径后执行删除；该操作不可恢复：
 
@@ -142,6 +146,8 @@ $dataRoot
 
 ### 从源码安装
 
+先正常停止 DSH Web，再执行下面的依赖准备、构建和链接安装。
+
 ```powershell
 git clone https://github.com/yzj555/jira-workbench.git
 Set-Location .\jira-workbench
@@ -158,7 +164,11 @@ dsh web
 
 三个 `link:` 包必须来自同一个 checkout 和同一个版本。修改 `packages/dsh-client/src` 后必须重新构建 `lib/client.js` 并重启 DSH；只修改 Host/Core 的 `.mjs` 文件也应重启 DSH，避免继续使用旧模块实例。
 
+源码链接切回 registry 时，先停止 DSH、从同一 profile 移除三个直接链接依赖，再只安装发布版 Host。仅重新添加 Host 不保证 Core / Client 已离开源码路径；用 `why` 同时核对版本和实际来源。
+
 ### 从 GitHub Release 离线安装
+
+Release ZIP 不包含全部第三方运行依赖。真正断网使用前，须准备 DSH 环境及所需依赖 / package-manager 缓存；仅解压和 `link:` 不保证在无缓存机器上离线运行。
 
 1. 下载同一版本的 `jira-workbench-assistant-<version>-win-x64.zip` 和 `SHA256SUMS.txt`。
 2. 核对 ZIP 的 SHA-256，并解压到不会移动的目录。
