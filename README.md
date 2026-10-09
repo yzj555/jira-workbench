@@ -27,6 +27,7 @@ Jira 工作台把 Jira 待办、JXL Sheets、Codex 对话和 SVN 提交连接到
 | --- | --- | --- | --- |
 | `@jira-workbench/core` | [`packages/core/`](packages/core/README.md) | 固定业务核：Jira/JXL/SVN 全部规则与状态，宿主能力全部构造参数注入 | 独立 MCP 服务 + `createCoreService` 组装 |
 | `jira-workbench-codex` | [`packages/codex/`](packages/codex/README.md) | Codex 适配层 | 官方 Plugin/MCP Apps UI + CDP UI 注入 + installer |
+| `@jira-workbench/codex-client` | [`packages/codex-client/`](packages/codex-client/README.md) | Codex 原生接入预览，含完整 Core 运行代码与 UI | 官方 Plugin 三入口 + MCP Apps 桥接；独立数据根，尚未发布或完成桌面验收 |
 | `@jira-workbench/dsh` | [`packages/dsh/`](packages/dsh/README.md) | DeepSeek Harness Host 适配层与安装入口 | 进程内 Cordis 工具 + credentials/approval |
 | `@jira-workbench/dsh-client` | [`packages/dsh-client/`](packages/dsh-client/README.zh.md) | DeepSeek Harness 浏览器适配层 | 原生设置卡片 + 侧边栏入口 + 中心主工作区 + 会话摘要 |
 
@@ -55,6 +56,7 @@ flowchart TB
 适配层只负责"把核接到某个宿主"，不承载业务规则：
 
 - **Codex** 用 UI 注入（侧栏工作台、会话浮窗）+ 官方 Plugin/MCP Apps 承载 Jira/SVN 能力。
+- **Codex 原生预览**另用 `codex-client` 验证无注入接入；目前不替换上述正式路径，会话创建/绑定、原生项目列表与 Skill 能力尚未打通，见[迁移记录](docs/codex-native-migration.md)。
 - **DeepSeek Harness** 在宿主进程内组装 Core，并把工具注册到 `ctx.tools`；浏览器端只承载原生设置卡片和工作台入口。
 - **其他工具**按各自的原生扩展机制接入：有 MCP 能力的直接连独立服务入口，有插件体系的写对应适配包，业务核与数据文件保持不变。
 
@@ -109,6 +111,7 @@ DSH 的 Release 校验、源码安装、升级、卸载、数据保留和故障�
 | --- | --- |
 | 安装目录 | `%LOCALAPPDATA%\Programs\JiraWorkbench` |
 | Codex 用户数据目录 | `%LOCALAPPDATA%\jira-workbench\`（配置、绑定、附件缓存、SVN 状态） |
+| Codex 原生预览数据目录 | `%LOCALAPPDATA%\jira-workbench\codex-native-preview\`（不自动导入旧凭据或绑定） |
 | DSH 用户数据目录 | `$DSH_HOME/jira-workbench/`（credentials 引用、项目绑定、SVN 状态） |
 | 面板服务 | `http://127.0.0.1:47823` |
 | Codex CDP | `http://127.0.0.1:47824` |
@@ -117,7 +120,7 @@ Codex 的 Jira PAT 和企业微信 Webhook 使用 Windows DPAPI；DSH 使用自�
 
 ## 开发与测试
 
-仓库根执行全量测试（覆盖 Core、Codex、DSH，并对 DSH 浏览器端执行 TypeScript 检查和构建）：
+仓库根执行全量测试（覆盖 Core、现有 Codex、Codex 原生预览、DSH，并执行客户端构建和 DSH TypeScript 检查）：
 
 ~~~powershell
 npm test
@@ -135,6 +138,8 @@ node packages/core/bin/serve.mjs        # 默认 127.0.0.1:47823
 
 - [`packages/core/README.md`](packages/core/README.md) — 业务核的结构、独立服务、依赖注入约定与核心业务能力（Jira 工作台、状态流转、会话绑定、SVN 审核、自动 Bug 监控）。
 - [`packages/codex/README.md`](packages/codex/README.md) — Codex 适配层：官方 Plugin 工作台、页面说明、会话浮窗、安装/升级/卸载、发布、开发运行与常见问题。
+- [`packages/codex-client/README.md`](packages/codex-client/README.md) — 新增 Codex 原生预览完整插件包、能力边界与隔离测试；[安装说明](packages/codex-client/INSTALL.md)仅用于预览验收。
+- [`docs/codex-native-migration.md`](docs/codex-native-migration.md) — 原生迁移进度、证据、待验收门槛与旧路径退役条件。
 - [`packages/dsh/README.md`](packages/dsh/README.md) — DeepSeek Harness Host 适配层：进程内工具、审批、凭据、工作台和独立数据根。
 - [`packages/dsh/INSTALL.md`](packages/dsh/INSTALL.md) — DSH 详细安装、升级、卸载、验证与故障排查。
 - [`packages/dsh/PUBLISHING.md`](packages/dsh/PUBLISHING.md) — npm 首次发布、Trusted Publishing 配置与后续发版流程。

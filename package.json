@@ -8,8 +8,13 @@
     "packages/*"
   ],
   "scripts": {
-    "test": "node --test \"packages/core/test/*.test.mjs\" \"packages/codex/test/*.test.mjs\" \"packages/dsh/test/*.test.mjs\" && npm run test:dsh-client",
+    "test": "node --test \"packages/core/test/*.test.mjs\" \"packages/codex/test/*.test.mjs\" \"packages/dsh/test/*.test.mjs\" && npm run test:dsh-client && npm run test:codex-client",
     "test:dsh-client": "npm --workspace @jira-workbench/dsh-client run typecheck && npm --workspace @jira-workbench/dsh-client run build && node --test \"packages/dsh-client/test/*.test.mjs\"",
+    "test:codex-client": "npm --workspace @jira-workbench/codex-client run build && npm --workspace @jira-workbench/codex-client test",
+    "build:codex-client": "npm --workspace @jira-workbench/codex-client run build",
+    "probe:codex-client:install": "node scripts/probe-codex-native-install.mjs",
+    "install:codex-client:preview": "node scripts/install-codex-native-preview.mjs",
+    "import:codex-client:config": "node scripts/import-codex-native-config.mjs",
     "release:npm:verify": "node scripts/publish-npm.mjs --dry-run",
     "release:npm:publish": "node scripts/publish-npm.mjs"
   },

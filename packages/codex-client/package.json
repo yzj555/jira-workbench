@@ -1,0 +1,31 @@
+{
+  "name": "@jira-workbench/codex-client",
+  "version": "0.33.8",
+  "type": "module",
+  "description": "Native Codex Plugin/MCP Apps adapter for Jira Workbench, with bundled local Core runtime.",
+  "license": "MIT",
+  "main": "dist/index.mjs",
+  "exports": { ".": "./dist/index.mjs", "./package.json": "./package.json" },
+  "bin": { "jira-workbench-codex-mcp": "dist/stdio-entry.mjs" },
+  "engines": { "node": ">=22" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yzj555/jira-workbench.git",
+    "directory": "packages/codex-client"
+  },
+  "publishConfig": { "access": "public", "registry": "https://registry.npmjs.org/" },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "preview:ui": "node scripts/preview-ui.mjs",
+    "test": "node --test \"test/*.test.mjs\""
+  },
+  "dependencies": {
+    "@jira-workbench/core": "0.33.8",
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": { "esbuild": "^0.28.2" },
+  "files": [
+    "dist/", "ui/", "plugin.json", "mcp.json", ".mcp.json", ".codex-plugin/", "README.md", "INSTALL.md", "LICENSE"
+  ]
+}

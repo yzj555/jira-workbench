@@ -14,6 +14,9 @@ if (tagVersion !== version) throw new Error(`Release tag v${tagVersion} 与 pack
 for (const relative of [
   "packages/core/package.json",
   "packages/codex/package.json",
+  "packages/codex-client/package.json",
+  "packages/codex-client/plugin.json",
+  "packages/codex-client/.codex-plugin/plugin.json",
   "packages/dsh/package.json",
   "packages/dsh-client/package.json"
 ]) {
@@ -21,6 +24,16 @@ for (const relative of [
   if (normalizeVersion(manifest.version) !== version) {
     throw new Error(`${relative} 没有同步到 v${version}。`);
   }
+}
+const nativeManifest = JSON.parse(await readFile(join(root, "packages/codex-client/package.json"), "utf8"));
+if (nativeManifest.dependencies?.["@jira-workbench/core"] !== packageJson.version) {
+  throw new Error(`packages/codex-client/package.json 的 @jira-workbench/core 必须精确同步到 v${version}。`);
+}
+const lock = JSON.parse(await readFile(join(root, "package-lock.json"), "utf8"));
+const nativeLock = lock.packages?.["packages/codex-client"];
+if (nativeLock?.version !== nativeManifest.version
+    || nativeLock?.dependencies?.["@jira-workbench/core"] !== nativeManifest.dependencies["@jira-workbench/core"]) {
+  throw new Error("package-lock.json 的 packages/codex-client 版本或 Core 依赖与清单不一致。");
 }
 const dshManifest = JSON.parse(await readFile(join(root, "packages/dsh/package.json"), "utf8"));
 for (const dependency of ["@jira-workbench/core", "@jira-workbench/dsh-client"]) {

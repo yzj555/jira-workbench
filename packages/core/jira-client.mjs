@@ -583,7 +583,8 @@ export function createJiraClient({ fetchImpl = globalThis.fetch, timeoutMs = 15_
     };
   }
 
-  async function fetchProjects(config) {
+  async function fetchProjects(config, { signal } = {}) {
+    signal?.throwIfAborted();
     const version = config.deployment === "data_center" ? "2" : "3";
     const endpoint = `${config.baseUrl}/rest/api/${version}/project`;
     let response;
@@ -594,7 +595,7 @@ export function createJiraClient({ fetchImpl = globalThis.fetch, timeoutMs = 15_
           accept: "application/json",
           authorization: jiraAuthenticationHeader(config)
         },
-        signal: AbortSignal.timeout(timeoutMs)
+        signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(timeoutMs)]) : AbortSignal.timeout(timeoutMs)
       });
     } catch (error) {
       const timeout = error.name === "TimeoutError" || error.name === "AbortError";
@@ -717,8 +718,10 @@ export function createJiraClient({ fetchImpl = globalThis.fetch, timeoutMs = 15_
     projectKey = "",
     projectId = "",
     projectName = "",
-    projectAliases: requestedProjectAliases = []
+    projectAliases: requestedProjectAliases = [],
+    signal
   } = {}) {
+    signal?.throwIfAborted();
     const version = config.deployment === "data_center" ? "2" : "3";
     const endpoints = [
       `${config.baseUrl}/rest/api/${version}/filter/search?maxResults=1000`,
@@ -728,6 +731,7 @@ export function createJiraClient({ fetchImpl = globalThis.fetch, timeoutMs = 15_
     const results = [];
     let lastFailure = null;
     for (const endpoint of endpoints) {
+      signal?.throwIfAborted();
       let response;
       try {
         response = await fetchImpl(endpoint, {
@@ -736,13 +740,14 @@ export function createJiraClient({ fetchImpl = globalThis.fetch, timeoutMs = 15_
             accept: "application/json",
             authorization: jiraAuthenticationHeader(config)
           },
-          signal: AbortSignal.timeout(timeoutMs)
+          signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(timeoutMs)]) : AbortSignal.timeout(timeoutMs)
         });
       } catch (error) {
         const timeout = error.name === "TimeoutError" || error.name === "AbortError";
         lastFailure = new JiraApiError(timeout ? "读取 Jira Filter 超时。" : `无法读取 Jira Filter：${error.message}`, {
           code: timeout ? "JIRA_FILTER_TIMEOUT" : "JIRA_UNREACHABLE"
         });
+        if (signal?.aborted) throw lastFailure;
         continue;
       }
       const payload = await responsePayload(response);
@@ -766,6 +771,7 @@ export function createJiraClient({ fetchImpl = globalThis.fetch, timeoutMs = 15_
         let startAt = firstPage.length;
         let pages = 0;
         while (total > startAt && pages < 50) {
+          signal?.throwIfAborted();
           const pageUrl = `${config.baseUrl}/rest/api/${version}/filter/search?startAt=${startAt}&maxResults=${pageSize}`;
           let pageResponse;
           try {
@@ -775,9 +781,10 @@ export function createJiraClient({ fetchImpl = globalThis.fetch, timeoutMs = 15_
                 accept: "application/json",
                 authorization: jiraAuthenticationHeader(config)
               },
-              signal: AbortSignal.timeout(timeoutMs)
+              signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(timeoutMs)]) : AbortSignal.timeout(timeoutMs)
             });
-          } catch {
+          } catch (error) {
+            if (signal?.aborted) throw error;
             break;
           }
           const pagePayload = await responsePayload(pageResponse);
@@ -791,6 +798,7 @@ export function createJiraClient({ fetchImpl = globalThis.fetch, timeoutMs = 15_
       }
     }
     if (!results.length && config.deployment === "data_center") {
+      signal?.throwIfAborted();
       // Jira 9.x installations may disable the REST collection endpoints
       // while still exposing the authenticated Manage Filters view. Use it
       // only as a read-only discovery fallback, then resolve each JQL through
@@ -803,20 +811,21 @@ export function createJiraClient({ fetchImpl = globalThis.fetch, timeoutMs = 15_
             accept: "text/html,application/xhtml+xml",
             authorization: jiraAuthenticationHeader(config)
           },
-          signal: AbortSignal.timeout(timeoutMs)
+          signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(timeoutMs)]) : AbortSignal.timeout(timeoutMs)
         });
         if (manageResponse.ok) {
           const html = await manageResponse.text();
           const discovered = parseManageFiltersHtml(html).slice(0, 200);
           const details = await Promise.all(discovered.map(async (filter) => {
             try {
+              signal?.throwIfAborted();
               const detailResponse = await fetchImpl(`${config.baseUrl}/rest/api/${version}/filter/${filter.id}`, {
                 method: "GET",
                 headers: {
                   accept: "application/json",
                   authorization: jiraAuthenticationHeader(config)
                 },
-                signal: AbortSignal.timeout(timeoutMs)
+                signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(timeoutMs)]) : AbortSignal.timeout(timeoutMs)
               });
               const detail = await responsePayload(detailResponse);
               if (!detailResponse.ok) return filter;
@@ -831,6 +840,7 @@ export function createJiraClient({ fetchImpl = globalThis.fetch, timeoutMs = 15_
         // Keep an empty list if the HTML fallback is unavailable.
       }
     }
+    signal?.throwIfAborted();
     if (!results.length && lastFailure && endpoints.length) {
       // A user may have access to neither collection endpoint. Preserve the
       // useful upstream error instead of presenting an empty selector.

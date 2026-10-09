@@ -91,6 +91,77 @@ export {
 
 const uiHtmlPromise = readFile(new URL("./ui/task-board.html", import.meta.url), "utf8");
 
+function mergeMetadata(base, patch, label) {
+  if (patch == null) return base;
+  if (typeof patch !== "object" || Array.isArray(patch) || typeof patch.then === "function") {
+    throw new TypeError(`${label} 必须是元数据对象。`);
+  }
+  if (patch.ui != null && (typeof patch.ui !== "object" || Array.isArray(patch.ui))) {
+    throw new TypeError(`${label}.ui 必须是元数据对象。`);
+  }
+  return {
+    ...base,
+    ...patch,
+    ...(patch.ui ? { ui: { ...base?.ui, ...patch.ui } } : {})
+  };
+}
+
+function uiResourceDefinitions(uiResources) {
+  if (!Array.isArray(uiResources)) throw new TypeError("uiResources 必须是数组。");
+  const resources = new Map([[JIRA_TASK_BOARD_RESOURCE_URI, {
+    name: "jira-workbench",
+    uri: JIRA_TASK_BOARD_RESOURCE_URI,
+    title: "Jira 任务工作台",
+    description: "查看待办、历史、JXL Sheets、任务详情、会话关联状态与 SVN 审核提交。",
+    mimeType: "text/html;profile=mcp-app",
+    loadHtml: () => uiHtmlPromise,
+    _meta: {
+      ui: {
+        prefersBorder: true,
+        csp: { connectDomains: [], resourceDomains: [] }
+      }
+    }
+  }]]);
+  const customUris = new Set();
+  for (const resource of uiResources) {
+    if (!resource || typeof resource !== "object" || Array.isArray(resource)
+      || typeof resource.uri !== "string" || !resource.uri.trim()) {
+      throw new TypeError("UI Resource 必须包含非空 uri。");
+    }
+    if (customUris.has(resource.uri)) throw new TypeError(`UI Resource uri 重复：${resource.uri}`);
+    customUris.add(resource.uri);
+    const previous = resources.get(resource.uri);
+    const resolved = {
+      mimeType: "text/html;profile=mcp-app",
+      ...previous,
+      ...resource,
+      _meta: mergeMetadata(previous?._meta, resource._meta, "UI Resource._meta")
+    };
+    if (typeof resolved.name !== "string" || !resolved.name.trim()) {
+      throw new TypeError("UI Resource 必须包含非空 name。");
+    }
+    if (typeof resolved.loadHtml !== "function") throw new TypeError("UI Resource.loadHtml 必须是函数。");
+    if (typeof resolved.mimeType !== "string" || !resolved.mimeType.trim()) {
+      throw new TypeError("UI Resource.mimeType 必须是非空字符串。");
+    }
+    resources.set(resource.uri, resolved);
+  }
+  const names = new Set();
+  for (const resource of resources.values()) {
+    if (names.has(resource.name)) throw new TypeError(`UI Resource name 重复：${resource.name}`);
+    names.add(resource.name);
+  }
+  return [...resources.values()];
+}
+
+/**
+ * Host adapters can override/append UI resources without changing shared HTML:
+ * uiResources: [{ name, uri, title?, description?, mimeType?, loadHtml({ uri, version }), _meta? }].
+ * toolMetadata(definition) returns a metadata patch; ui fields are merged with the original.
+ * additionalTools uses the same definition shape as buildToolDefinitions and cannot replace built-ins.
+ * invokeTool(definition, args, extra) can track host lifecycle around the unchanged business handler.
+ * Core does not interpret host-specific entrypoints or implement their capabilities.
+ */
 export function createJiraTaskBoardMcpServer({
   workbench,
   conversations,
@@ -102,40 +173,23 @@ export function createJiraTaskBoardMcpServer({
   loadIssues,
   approvalProvider = createLocalApprovalProvider(),
   version = "0.1.0",
-  serverName = "jira-workbench"
+  serverName = "jira-workbench",
+  uiResources = [],
+  toolMetadata,
+  additionalTools = [],
+  invokeTool
 } = {}) {
   const service = workbench || (typeof loadIssues === "function" ? { listTasks: loadIssues } : null);
   if (!service?.listTasks) throw new TypeError("workbench.listTasks 必须是函数。");
-
-  const server = new McpServer(
-    { name: serverName, version },
-    { instructions: "通过工具查看当前用户的 Jira 待办、历史、JXL Sheets、任务详情、Codex 会话绑定与 SVN 审核状态。只读工具不会修改外部状态；Jira 状态流转、本地绑定写入和 SVN 提交必须经过用户在交互面板中的明确确认，并由服务端复检。SVN 提交只能使用已审核的显式路径与一次性确认。UI 已展示完整结构化结果，除非用户明确要求，否则不要重复输出长列表。" }
-  );
-
-  server.registerResource(
-    "jira-workbench",
-    JIRA_TASK_BOARD_RESOURCE_URI,
-    {
-      title: "Jira 任务工作台",
-      description: "查看待办、历史、JXL Sheets、任务详情、会话关联状态与 SVN 审核提交。",
-      mimeType: "text/html;profile=mcp-app"
-    },
-    async () => ({
-      contents: [{
-        uri: JIRA_TASK_BOARD_RESOURCE_URI,
-        mimeType: "text/html;profile=mcp-app",
-        text: (await uiHtmlPromise).replaceAll("__JIRA_WORKBENCH_VERSION__", version),
-        _meta: {
-          ui: {
-            prefersBorder: true,
-            csp: { connectDomains: [], resourceDomains: [] }
-          }
-        }
-      }]
-    })
-  );
-
-  for (const definition of buildToolDefinitions({
+  if (toolMetadata != null && typeof toolMetadata !== "function") {
+    throw new TypeError("toolMetadata 必须是函数。");
+  }
+  if (invokeTool != null && typeof invokeTool !== "function") {
+    throw new TypeError("invokeTool 必须是函数。");
+  }
+  if (!Array.isArray(additionalTools)) throw new TypeError("additionalTools 必须是数组。");
+  const resources = uiResourceDefinitions(uiResources);
+  const definitions = [...buildToolDefinitions({
     service,
     conversations,
     svn,
@@ -144,7 +198,43 @@ export function createJiraTaskBoardMcpServer({
     updates,
     desktop,
     approvalProvider
-  })) {
+  }), ...additionalTools];
+  const names = new Set();
+  for (const definition of definitions) {
+    if (!definition || typeof definition.name !== "string" || !definition.name.trim()
+      || typeof definition.handler !== "function") {
+      throw new TypeError("MCP 工具必须包含非空 name 和 handler 函数。");
+    }
+    if (names.has(definition.name)) throw new TypeError(`MCP 工具 name 重复：${definition.name}`);
+    names.add(definition.name);
+  }
+
+  const server = new McpServer(
+    { name: serverName, version },
+    { instructions: "通过工具查看当前用户的 Jira 待办、历史、JXL Sheets、任务详情、Codex 会话绑定与 SVN 审核状态。只读工具不会修改外部状态；Jira 状态流转、本地绑定写入和 SVN 提交必须经过用户在交互面板中的明确确认，并由服务端复检。SVN 提交只能使用已审核的显式路径与一次性确认。UI 已展示完整结构化结果，除非用户明确要求，否则不要重复输出长列表。" }
+  );
+
+  for (const resource of resources) {
+    server.registerResource(
+      resource.name,
+      resource.uri,
+      { title: resource.title, description: resource.description, mimeType: resource.mimeType },
+      async (uri) => {
+        const html = await resource.loadHtml({ uri: uri.href, version });
+        if (typeof html !== "string") throw new TypeError("UI Resource.loadHtml 必须返回字符串。");
+        return {
+          contents: [{
+            uri: resource.uri,
+            mimeType: resource.mimeType,
+            text: html.replaceAll("__JIRA_WORKBENCH_VERSION__", version),
+            ...(resource._meta === undefined ? {} : { _meta: resource._meta })
+          }]
+        };
+      }
+    );
+  }
+
+  for (const definition of definitions) {
     server.registerTool(
       definition.name,
       {
@@ -152,9 +242,9 @@ export function createJiraTaskBoardMcpServer({
         description: definition.description,
         inputSchema: definition.inputSchema,
         annotations: definition.annotations,
-        _meta: definition._meta
+        _meta: mergeMetadata(definition._meta, toolMetadata?.(definition), "toolMetadata 返回值")
       },
-      definition.handler
+      invokeTool ? (args, extra) => invokeTool(definition, args, extra) : definition.handler
     );
   }
 

@@ -14,6 +14,9 @@ for (const relative of [
   "package-lock.json",
   "packages/core/package.json",
   "packages/codex/package.json",
+  "packages/codex-client/package.json",
+  "packages/codex-client/plugin.json",
+  "packages/codex-client/.codex-plugin/plugin.json",
   "packages/dsh/package.json",
   "packages/dsh-client/package.json"
 ]) {
@@ -25,9 +28,12 @@ for (const relative of [
     value.dependencies["@jira-workbench/core"] = version;
     value.dependencies["@jira-workbench/dsh-client"] = version;
   }
+  if (relative === "packages/codex-client/package.json") {
+    value.dependencies["@jira-workbench/core"] = version;
+  }
   if (relative === "package-lock.json") {
     for (const entry of Object.values(value.packages || {})) {
-      if (["@jira-workbench/core", "@jira-workbench/dsh-client", "@jira-workbench/dsh"].includes(entry?.name)) {
+      if (["@jira-workbench/core", "jira-workbench-codex", "@jira-workbench/codex-client", "@jira-workbench/dsh-client", "@jira-workbench/dsh"].includes(entry?.name)) {
         entry.version = version;
       }
       if (entry?.dependencies?.["@jira-workbench/core"]) entry.dependencies["@jira-workbench/core"] = version;

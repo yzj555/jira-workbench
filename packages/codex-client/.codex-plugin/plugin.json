@@ -1,0 +1,12 @@
+{
+  "name": "jira-workbench-native",
+  "version": "0.33.8",
+  "description": "Jira 工作台的 Codex 原生接入预览。",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Jira 工作台（原生预览）",
+    "shortDescription": "任务、Sheets、附件、项目目录与 SVN 人工审核。",
+    "developerName": "Jira Workbench",
+    "category": "Productivity"
+  }
+}
